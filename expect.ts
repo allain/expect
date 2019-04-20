@@ -94,3 +94,9 @@ export function expect(value: any): Expected {
 
   return self;
 }
+
+export const mock = {
+  fn: function () {
+
+  }
+}

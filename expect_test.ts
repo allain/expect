@@ -1,13 +1,10 @@
 import { runTests, test } from "https://deno.land/std/testing/mod.ts";
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std/testing/asserts.ts";
-import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals, AssertionError } from "https://deno.land/std/testing/asserts.ts";
 
 import { expect } from "./expect.ts";
+import * as mock from "./mock.ts";
 
-async function assertAllPass(...fns) {
+async function assertAllPass(...fns: Function[]) {
   for (let fn of fns) {
     try {
       assertEquals(await fn(), undefined);
@@ -19,7 +16,7 @@ async function assertAllPass(...fns) {
   }
 }
 
-async function assertFail(fn) {
+async function assertFail(fn: Function) {
   let thrown = true;
   try {
     let resolution = await fn();
@@ -226,8 +223,8 @@ test(async function toBeNull() {
 });
 
 test(async function toBeInstanceOf() {
-  class A {}
-  class B {}
+  class A { }
+  class B { }
 
   await assertAllPass(
     () => expect(new A()).toBeInstanceOf(A),
@@ -288,7 +285,6 @@ test(async function toContain() {
 });
 
 test(async function toThrow() {
-  /*
   await assertAllPass(
     () =>
       expect(() => {
@@ -297,9 +293,13 @@ test(async function toThrow() {
 
     () => expect(Promise.reject(new Error("TEST"))).rejects.toThrow("TEST")
   );
-  */
 
   await assertAllFail(() => expect(() => true).toThrow());
 });
+
+test(async function mockCanCreateMockFunctions() {
+  const m = mock.fn()
+  assertEquals(typeof m, 'function')
+})
 
 runTests();
