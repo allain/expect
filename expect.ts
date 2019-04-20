@@ -1,7 +1,7 @@
 import * as matchers from "./matchers.ts";
 import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
 
-interface Expected {
+export interface Expected {
   toBe(candidate: any, msg?: string): void;
   toEqual(candidate: any, msg?: string): void;
   toBeTruthy(msg?: string): void;
@@ -104,10 +104,4 @@ export function expect(value: any): Expected {
   );
 
   return self;
-}
-
-export const mock = {
-  fn: function () {
-
-  }
 }
