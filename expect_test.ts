@@ -4,7 +4,8 @@ import {
   assertEquals,
   assertThrows
 } from "https://deno.land/std/testing/asserts.ts";
-import { expect, AssertionError } from "./expect.ts";
+import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
+import { expect } from "./expect.ts";
 
 async function assertAllPass(...fns) {
   for (let fn of fns) {

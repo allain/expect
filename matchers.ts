@@ -1,4 +1,4 @@
-import { AssertionError } from "./expect.ts";
+import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
 
 type MatcherState = {
   isNot: boolean;
@@ -42,53 +42,31 @@ export function toBeLessThanOrEqual(
   if (value > number) throw new AssertionError(msg);
 }
 
-export function toBeTruthy(
-  value: any,
-  msg?: string
-): void {
+export function toBeTruthy(value: any, msg?: string): void {
   if (!value) throw new AssertionError(msg);
 }
 
-export function toBeFalsy(
-  value: any,
-  msg?: string
-): void {
+export function toBeFalsy(value: any, msg?: string): void {
   if (value) throw new AssertionError(msg);
 }
 
-export function toBeDefined(
-  value: any,
-  msg?: string
-): void {
+export function toBeDefined(value: any, msg?: string): void {
   if (typeof value === "undefined") throw new AssertionError(msg);
 }
 
-export function toBeUndefined(
-  value: any,
-  msg?: string
-): void {
+export function toBeUndefined(value: any, msg?: string): void {
   if (typeof value !== "undefined") throw new AssertionError(msg);
 }
 
-export function toBeNull(
-  value: any,
-  msg?: string
-): void {
+export function toBeNull(value: any, msg?: string): void {
   if (value !== null) throw new AssertionError(msg);
 }
 
-export function toBeNaN(
-  value: any,
-  msg?: string
-): void {
+export function toBeNaN(value: any, msg?: string): void {
   if (!isNaN(value)) throw new AssertionError(msg);
 }
 
-export function toBeInstanceOf(
-  value: any,
-  clazz,
-  msg?: string
-): void {
+export function toBeInstanceOf(value: any, clazz, msg?: string): void {
   if (!(value instanceof clazz)) throw new AssertionError(msg);
 }
 
@@ -99,8 +77,7 @@ export function toMatch(
 ): void {
   const valueStr = value.toString();
   if (typeof pattern === "string") {
-    if (valueStr.indexOf(pattern) === -1)
-      throw new AssertionError(msg);
+    if (valueStr.indexOf(pattern) === -1) throw new AssertionError(msg);
   } else if (pattern instanceof RegExp) {
     if (!pattern.exec(valueStr)) throw new AssertionError(msg);
   }
@@ -116,21 +93,13 @@ export function toHaveProperty(
   }
 }
 
-export function toHaveLength(
-  value: any,
-  length: number,
-  msg?: string
-): void {
+export function toHaveLength(value: any, length: number, msg?: string): void {
   if ("length" in value && value.length !== length) {
     throw new AssertionError(msg);
   }
 }
 
-export function toContain(
-  value: any,
-  item: any,
-  msg?: string
-): void {
+export function toContain(value: any, item: any, msg?: string): void {
   if (!Array.isArray(value))
     throw new AssertionError(`expect array but was ${value}`);
 

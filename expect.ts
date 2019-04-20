@@ -1,11 +1,5 @@
 import * as matchers from "./matchers.ts";
-
-export class AssertionError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "AssertionError";
-  }
-}
+import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
 
 interface Expected {
   toBe(candidate: any, msg?: string): void;

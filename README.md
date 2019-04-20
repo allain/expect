@@ -3,12 +3,11 @@
 A deno implementation of `expect` in order to write tests in a more `jest` like style.
 
 ```typescript
-import { expect } from './expect.ts'
+import { expect } from "./expect.ts";
 
-expect(10).toEqual(10)
-expect(Promise.resolves(20)).resolves.toEqual(20)
+expect(10).toEqual(10);
+expect(Promise.resolves(20)).resolves.toEqual(20);
 ```
-
 
 ```typescript
 interface Expected {
