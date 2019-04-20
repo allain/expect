@@ -1,18 +1,27 @@
 const MOCK_SYMBOL = Symbol.for('@MOCK')
 
-type MockCall = {
+export type MockCall = {
     args: any[],
-    result: any,
-    timestamp: number
+    returned?: any,
+    thrown?: any,
+    timestamp: number,
+    returns: boolean,
+    throws: boolean
 }
 
-export function fn(impl?: (...any) => any) {
+export function fn(...stubs: Function[]) {
     const calls: MockCall[] = []
 
     const f = (...args: any[]) => {
-        const result = impl ? impl() : undefined
-        calls.push({ args, result, timestamp: Date.now() })
-        return result
+        const stub = stubs[calls.length] || stubs[stubs.length - 1]
+        try {
+            const returned = stub ? stub(...args) : undefined
+            calls.push({ args, returned, timestamp: Date.now(), returns: true, throws: false })
+            return returned
+        } catch (err) {
+            calls.push({ args, timestamp: Date.now(), returns: false, thrown: err, throws: true })
+            throw err
+        }
     }
 
     Object.defineProperty(f, MOCK_SYMBOL, {

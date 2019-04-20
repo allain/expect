@@ -20,6 +20,16 @@ interface Expected {
   toBeGreaterThanOrEqual(number: number, msg?: string): void;
   toBeLessThan(number: number, msg?: string): void;
   toBeLessThanOrEqual(number: number, msg?: string): void;
+  toHaveBeenCalled(msg?: string): void;
+  toHaveBeenCalledTimes(number: number, msg?: string): void;
+  toHaveBeenCalledWith(args: any[], msg?: string): void;
+  toHaveBeenLastCalledWith(args: any[], msg?: string): void;
+  toHaveBeenNthCalledWith(nthCall: number, args: any[], msg?: string): void;
+  toHaveReturned(msg?: string): void;
+  toHaveReturnedTimes(number: number, msg?: string): void;
+  toHaveReturnedWith(value: any, msg?: string): void;
+  toHaveLastReturnedWith(value: any, msg?: string): void;
+  toHaveNthReturnedWith(nthCall: number, value: any, msg?: string): void;
 
   not: Expected;
   resolves: Expected;
@@ -63,31 +73,32 @@ export function expect(value: any): Expected {
         }
 
         const matcher = matchers[name];
-        if (matcher) {
-          return (...args) => {
-            function applyMatcher(value, args) {
-              if (isNot) {
-                let thrown = null;
-                try {
-                  matcher(value, ...args);
-                } catch (err) {
-                  thrown = err;
-                }
-                if (thrown) {
-                  if (!(thrown instanceof AssertionError)) throw thrown;
-                } else {
-                  throw new AssertionError("expected it to not");
-                }
-              } else {
-                matcher(value, ...args);
-              }
-            }
+        if (!matcher)
+          throw new TypeError(typeof name === 'string' ? `Matcher not found: ${name}` : 'Matcher not found')
 
-            return isPromised
-              ? value.then(value => applyMatcher(value, args))
-              : applyMatcher(value, args);
-          };
-        }
+        return (...args) => {
+          function applyMatcher(value, args) {
+            if (isNot) {
+              let thrown = null;
+              try {
+                matcher(value, ...args);
+              } catch (err) {
+                thrown = err;
+              }
+              if (thrown) {
+                if (!(thrown instanceof AssertionError)) throw thrown;
+              } else {
+                throw new AssertionError("expected it to not");
+              }
+            } else {
+              matcher(value, ...args);
+            }
+          }
+
+          return isPromised
+            ? value.then(value => applyMatcher(value, args))
+            : applyMatcher(value, args);
+        };
       }
     }
   );

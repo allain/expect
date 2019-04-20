@@ -1,4 +1,5 @@
 import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
+import * as mock from './mock.ts'
 
 type MatcherState = {
   isNot: boolean;
@@ -154,3 +155,114 @@ function same(a: any, b: any): boolean {
 
   return a === b;
 }
+
+function extractMockCalls(value: any, name: string): mock.MockCall[] {
+  if (typeof value !== 'function') {
+    throw new AssertionError(`${name} only works on mock functions. received: ${value}`)
+  }
+  const calls = mock.calls(value)
+  if (calls === null) {
+    throw new AssertionError(`${name} only works on mock functions`)
+  }
+
+  return calls
+}
+
+export function toHaveBeenCalled(value, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenCalled')
+  if (calls.length === 0) {
+    throw new AssertionError(msg || 'function not called')
+  }
+}
+
+export function toHaveBeenCalledTimes(value: any, times: number, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenCalledTimes')
+  if (calls.length !== times) {
+    throw new AssertionError(msg || `expected ${times} calls but was called: ${calls.length}`)
+  }
+}
+
+export function toHaveBeenCalledWith(value: any, args: any[], msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenCalledWith')
+  const wasCalledWith = calls.some(c => same(c.args, args))
+  if (!wasCalledWith) {
+    throw new AssertionError(msg || `function not called with: ${args}`)
+  }
+}
+
+export function toHaveBeenLastCalledWith(value: any, args: any[], msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenLastCalledWith')
+  if (calls.length) {
+    const lastCall = calls[calls.length - 1]
+    if (!same(lastCall.args, args))
+      throw new AssertionError(msg || `expect last call args to be ${args} but was: ${lastCall.args}`)
+  } else {
+    throw new AssertionError(msg || `function was not called. expected arguments: ${args}`)
+  }
+}
+
+export function toHaveBeenNthCalledWith(value: any, nth: number, args: any[], msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenNthCalledWith')
+  const nthCall = calls[nth - 1]
+  if (nthCall) {
+    if (!same(nthCall.args, args))
+      throw new AssertionError(msg || `expect ${nth}th call args to be ${args} but was: ${nthCall.args}`)
+  } else {
+    throw new AssertionError(msg || `${nth}th call was not made.`)
+  }
+}
+
+export function toHaveReturnedWith(value: any, result: any, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenNthCalledWith')
+  const wasReturnedWith = calls.some(c => c.returns && same(c.returned, result))
+  if (!wasReturnedWith) {
+    throw new AssertionError(msg || `function did not return: ${result}`)
+  }
+}
+
+export function toHaveReturned(value: any, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenCalledTimes')
+  if (!calls.some(c => c.returns)) {
+    throw new AssertionError(msg || `expected function to return but it never did`)
+  }
+}
+
+export function toHaveLastReturnedWith(value: any, expected: any, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveBeenCalledTimes')
+  const lastCall = calls[calls.length - 1]
+  if (!lastCall) {
+    throw new AssertionError(msg || 'no calls made to function')
+  }
+  if (lastCall.throws) {
+    throw new AssertionError(msg || `last call to function threw: ${lastCall.thrown}`)
+  }
+
+  if (!same(lastCall.returned, expected)) {
+    throw new AssertionError(msg || `expected last call to return ${expected} but returned: ${lastCall.returned}`)
+  }
+}
+
+export function toHaveReturnedTimes(value: any, times: number, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveReturnedTimes')
+  const returnCount = calls.filter(c => c.returns).length
+  if (returnCount !== times) {
+    throw new AssertionError(msg || `expected ${times} returned times but returned ${returnCount} times`)
+  }
+}
+
+export function toHaveNthReturnedWith(value: any, nth: number, expected: any, msg?: string) {
+  const calls = extractMockCalls(value, 'toHaveNthReturnedWith')
+  const nthCall = calls[nth - 1]
+  if (!nthCall) {
+    throw new AssertionError(msg || `${nth} calls were now made`)
+  }
+
+  if (nthCall.throws) {
+    throw new AssertionError(msg || `${nth}th call to function threw: ${nthCall.thrown}`)
+  }
+
+  if (!same(nthCall.returned, expected)) {
+    throw new AssertionError(msg || `expected ${nth}th call to return ${expected} but returned: ${nthCall.returned}`)
+  }
+}
+
