@@ -2,9 +2,9 @@ import { runTests, test } from "https://deno.land/std/testing/mod.ts";
 import {
   assert,
   assertEquals,
-  assertThrows
 } from "https://deno.land/std/testing/asserts.ts";
 import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
+
 import { expect } from "./expect.ts";
 
 async function assertAllPass(...fns) {

@@ -16,8 +16,6 @@ interface Expected {
   toHaveLength(length: number, msg?: string): void;
   toContain(item: any, msg?: string): void;
   toThrow(error?: RegExp | string, msg?: string): void;
-
-  // comparison
   toBeGreaterThan(number: number, msg?: string): void;
   toBeGreaterThanOrEqual(number: number, msg?: string): void;
   toBeLessThan(number: number, msg?: string): void;
@@ -30,7 +28,7 @@ interface Expected {
 
 export function expect(value: any): Expected {
   let isNot = false;
-  let promised = false;
+  let isPromised = false;
   const self = new Proxy(
     {},
     {
@@ -44,7 +42,7 @@ export function expect(value: any): Expected {
           if (!(value instanceof Promise))
             throw new AssertionError("expected value must be a Promise");
 
-          promised = true;
+          isPromised = true;
           return self;
         }
 
@@ -60,7 +58,7 @@ export function expect(value: any): Expected {
             },
             err => err
           );
-          promised = true;
+          isPromised = true;
           return self;
         }
 
@@ -85,7 +83,7 @@ export function expect(value: any): Expected {
               }
             }
 
-            return promised
+            return isPromised
               ? value.then(value => applyMatcher(value, args))
               : applyMatcher(value, args);
           };
