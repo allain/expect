@@ -1,7 +1,11 @@
 import { runTests, test } from "https://deno.land/std/testing/mod.ts";
-import { assertEquals, AssertionError } from "https://deno.land/std/testing/asserts.ts";
+import {
+  assertEquals,
+  assertThrows,
+  AssertionError
+} from "https://deno.land/std/testing/asserts.ts";
 
-import { expect } from "./expect.ts";
+import { expect, addMatchers } from "./expect.ts";
 import * as mock from "./mock.ts";
 
 async function assertPass(fn: Function) {
@@ -16,7 +20,7 @@ async function assertPass(fn: Function) {
 
 async function assertAllPass(...fns: Function[]) {
   for (let fn of fns) {
-    await assertPass(fn)
+    await assertPass(fn);
   }
 }
 
@@ -42,6 +46,30 @@ async function assertAllFail(...fns) {
 
 test(function exportsFunction() {
   assertEquals(typeof expect, "function");
+});
+
+test(function throwsWhenNoMatcherFound() {
+  assertThrows(
+    //@ts-ignore
+    () => expect(true).toBeFancy(),
+    TypeError,
+    "matcher not found: toBeFancy"
+  );
+});
+
+test(function allowsExtendingMatchers() {
+  addMatchers({
+    toBeFancy(value: any) {
+      if (value === "fancy") {
+        return { pass: true };
+      } else {
+        return { pass: false, message: "was not fancy" };
+      }
+    }
+  });
+
+  // @ts-ignore
+  assertPass(() => expect("fancy").toBeFancy());
 });
 
 test(async function toBe() {
@@ -227,8 +255,8 @@ test(async function toBeNull() {
 });
 
 test(async function toBeInstanceOf() {
-  class A { }
-  class B { }
+  class A {}
+  class B {}
 
   await assertAllPass(
     () => expect(new A()).toBeInstanceOf(A),
@@ -304,303 +332,308 @@ test(async function toThrow() {
 test(async function toHaveBeenCalled() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m(10)
-      m(20)
-      expect(m).toHaveBeenCalled()
+      const m = mock.fn();
+      m(10);
+      m(20);
+      expect(m).toHaveBeenCalled();
     },
     () => {
-      const m = mock.fn()
-      expect(m).not.toHaveBeenCalled()
-
+      const m = mock.fn();
+      expect(m).not.toHaveBeenCalled();
     }
-  )
+  );
 
-  assertAllFail(
-    () => {
-      const m = mock.fn()
-      expect(m).toHaveBeenCalled()
-    },
-  )
-})
+  assertAllFail(() => {
+    const m = mock.fn();
+    expect(m).toHaveBeenCalled();
+  });
+});
 
 test(function toHaveBeenCalledTimes() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveBeenCalledTimes(0)
+      const m = mock.fn();
+      expect(m).toHaveBeenCalledTimes(0);
     },
     () => {
-      const m = mock.fn()
-      m()
-      m()
-      expect(m).toHaveBeenCalledTimes(2)
+      const m = mock.fn();
+      m();
+      m();
+      expect(m).toHaveBeenCalledTimes(2);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveBeenCalledTimes(1)
+      const m = mock.fn();
+      expect(m).toHaveBeenCalledTimes(1);
     },
     () => {
-      const m = mock.fn()
-      m()
-      m()
-      expect(m).toHaveBeenCalledTimes(3)
+      const m = mock.fn();
+      m();
+      m();
+      expect(m).toHaveBeenCalledTimes(3);
     }
-  )
-})
+  );
+});
 
 test(function toHaveBeenCalledWith() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m(1, 2, 3)
-      expect(m).toHaveBeenCalledWith([1, 2, 3])
+      const m = mock.fn();
+      m(1, 2, 3);
+      expect(m).toHaveBeenCalledWith(1, 2, 3);
     },
     () => {
-      const m = mock.fn()
-      m(1, 2, 3)
-      m(2, 3, 4)
-      expect(m).toHaveBeenCalledWith([1, 2, 3])
-      expect(m).toHaveBeenCalledWith([2, 3, 4])
-    },
-  )
+      const m = mock.fn();
+      m(1, 2, 3);
+      m(2, 3, 4);
+      expect(m).toHaveBeenCalledWith(1, 2, 3);
+      expect(m).toHaveBeenCalledWith(2, 3, 4);
+    }
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveBeenCalledWith([1, 2])
+      const m = mock.fn();
+      expect(m).toHaveBeenCalledWith(1);
     },
     () => {
-      const m = mock.fn()
-      m(2)
-      expect(m).toHaveBeenCalledWith([1])
+      const m = mock.fn();
+      m(2);
+      expect(m).toHaveBeenCalledWith(1);
     }
-  )
-})
+  );
+});
 
 test(function toHaveBeenLastCalledWith() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m(1, 2, 3)
-      expect(m).toHaveBeenLastCalledWith([1, 2, 3])
+      const m = mock.fn();
+      m(1, 2, 3);
+      expect(m).toHaveBeenLastCalledWith(1, 2, 3);
     },
     () => {
-      const m = mock.fn()
-      m(1, 2, 3)
-      m(2, 3, 4)
-      expect(m).not.toHaveBeenLastCalledWith([1, 2, 3])
-      expect(m).toHaveBeenLastCalledWith([2, 3, 4])
+      const m = mock.fn();
+      m(1, 2, 3);
+      m(2, 3, 4);
+      expect(m).not.toHaveBeenLastCalledWith(1, 2, 3);
+      expect(m).toHaveBeenLastCalledWith(2, 3, 4);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveBeenLastCalledWith([1, 2])
+      const m = mock.fn();
+      expect(m).toHaveBeenLastCalledWith(1);
     },
     () => {
-      const m = mock.fn()
-      m(2)
-      expect(m).toHaveBeenLastCalledWith([1])
+      const m = mock.fn();
+      m(2);
+      expect(m).toHaveBeenLastCalledWith(1);
     }
-  )
-})
+  );
+});
 
 test(function toHaveBeenNthCalledWith() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m(1, 2, 3)
-      expect(m).toHaveBeenNthCalledWith(1, [1, 2, 3])
+      const m = mock.fn();
+      m(1, 2, 3);
+      expect(m).toHaveBeenNthCalledWith(1, 1, 2, 3);
     },
     () => {
-      const m = mock.fn()
-      m(1, 2, 3)
-      m(2, 3, 4)
-      expect(m).not.toHaveBeenNthCalledWith(2, [1, 2, 3])
-      expect(m).toHaveBeenNthCalledWith(2, [2, 3, 4])
+      const m = mock.fn();
+      m(1, 2, 3);
+      m(2, 3, 4);
+      expect(m).not.toHaveBeenNthCalledWith(2, 1, 2, 3);
+      expect(m).toHaveBeenNthCalledWith(2, 2, 3, 4);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveBeenNthCalledWith(1, [1, 2])
+      const m = mock.fn();
+      expect(m).toHaveBeenNthCalledWith(1, 1, 2);
     },
     () => {
-      const m = mock.fn()
-      m(2)
-      expect(m).toHaveBeenNthCalledWith(1, [1])
+      const m = mock.fn();
+      m(2);
+      expect(m).toHaveBeenNthCalledWith(1, 1);
     }
-  )
-})
+  );
+});
 
 test(function toHaveReturnedWith() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m()
-      expect(m).toHaveReturnedWith(undefined)
+      const m = mock.fn();
+      m();
+      expect(m).toHaveReturnedWith(undefined);
     },
     () => {
-      const m = mock.fn(() => true)
-      m()
-      expect(m).not.toHaveReturnedWith(false)
-      expect(m).toHaveReturnedWith(true)
+      const m = mock.fn(() => true);
+      m();
+      expect(m).not.toHaveReturnedWith(false);
+      expect(m).toHaveReturnedWith(true);
     },
     () => {
-      const m = mock.fn(() => { throw new Error('TEST') })
+      const m = mock.fn(() => {
+        throw new Error("TEST");
+      });
       try {
-        m()
-      } catch (err) { }
-      expect(m).not.toHaveReturnedWith(10)
+        m();
+      } catch (err) {}
+      expect(m).not.toHaveReturnedWith(10);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveReturnedWith(1)
+      const m = mock.fn();
+      expect(m).toHaveReturnedWith(1);
     },
     () => {
-      const m = mock.fn()
-      m(2)
-      expect(m).toHaveReturnedWith(1)
+      const m = mock.fn();
+      m(2);
+      expect(m).toHaveReturnedWith(1);
     }
-  )
-})
+  );
+});
 
 test(function toHaveReturnedTimes() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m()
-      expect(m).toHaveReturnedTimes(1)
+      const m = mock.fn();
+      m();
+      expect(m).toHaveReturnedTimes(1);
     },
     () => {
-      const m = mock.fn(() => true)
-      expect(m).toHaveReturnedTimes(0)
+      const m = mock.fn(() => true);
+      expect(m).toHaveReturnedTimes(0);
     },
     () => {
-      const m = mock.fn(() => { throw new Error('TEST') })
+      const m = mock.fn(() => {
+        throw new Error("TEST");
+      });
       try {
-        m()
-      } catch (err) { }
-      expect(m).toHaveReturnedTimes(0)
+        m();
+      } catch (err) {}
+      expect(m).toHaveReturnedTimes(0);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveReturnedTimes(1)
+      const m = mock.fn();
+      expect(m).toHaveReturnedTimes(1);
     },
     () => {
-      const m = mock.fn()
-      m(2)
-      expect(m).not.toHaveReturnedTimes(1)
+      const m = mock.fn();
+      m(2);
+      expect(m).not.toHaveReturnedTimes(1);
     }
-  )
-})
+  );
+});
 
 test(function toHaveReturned() {
   assertAllPass(
     () => {
-      const m = mock.fn()
-      m()
-      expect(m).toHaveReturned()
+      const m = mock.fn();
+      m();
+      expect(m).toHaveReturned();
     },
     () => {
-      const m = mock.fn()
-      expect(m).not.toHaveReturned()
+      const m = mock.fn();
+      expect(m).not.toHaveReturned();
     },
     () => {
-      const m = mock.fn(() => { throw new Error('TEST') })
+      const m = mock.fn(() => {
+        throw new Error("TEST");
+      });
       try {
-        m()
-      } catch (err) { }
-      expect(m).not.toHaveReturned()
+        m();
+      } catch (err) {}
+      expect(m).not.toHaveReturned();
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveReturned()
+      const m = mock.fn();
+      expect(m).toHaveReturned();
     },
     () => {
-      const m = mock.fn()
-      m()
-      expect(m).not.toHaveReturned()
+      const m = mock.fn();
+      m();
+      expect(m).not.toHaveReturned();
     },
     () => {
-      const m = mock.fn(() => { throw new Error('TEST') })
-      m()
-      expect(m).not.toHaveReturned()
+      const m = mock.fn(() => {
+        throw new Error("TEST");
+      });
+      m();
+      expect(m).not.toHaveReturned();
     }
-  )
-})
+  );
+});
 
 test(function toHaveLastReturnedWith() {
   assertAllPass(
     () => {
-      const m = mock.fn(x => x)
-      m(1)
-      m(2)
-      expect(m).toHaveLastReturnedWith(2)
+      const m = mock.fn(x => x);
+      m(1);
+      m(2);
+      expect(m).toHaveLastReturnedWith(2);
     },
     () => {
-      const m = mock.fn(x => x)
-      m(1)
-      m(2)
-      expect(m).toHaveLastReturnedWith(2)
+      const m = mock.fn(x => x);
+      m(1);
+      m(2);
+      expect(m).toHaveLastReturnedWith(2);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn(x => x)
-      expect(m).toHaveLastReturnedWith(1)
+      const m = mock.fn(x => x);
+      expect(m).toHaveLastReturnedWith(1);
     },
     () => {
-      const m = mock.fn(x => x)
-      m(2)
-      expect(m).toHaveLastReturnedWith(1)
+      const m = mock.fn(x => x);
+      m(2);
+      expect(m).toHaveLastReturnedWith(1);
     }
-  )
-})
+  );
+});
 
 test(function toHaveNthReturnedWith() {
   assertAllPass(
     () => {
-      const m = mock.fn(x => x)
-      m(1, 2, 3)
-      expect(m).toHaveNthReturnedWith(1, 1)
+      const m = mock.fn(x => x);
+      m(1, 2, 3);
+      expect(m).toHaveNthReturnedWith(1, 1);
     },
     () => {
-      const m = mock.fn(x => x)
-      m(1, 2, 3)
-      m(2, 3, 4)
-      expect(m).not.toHaveNthReturnedWith(2, 1)
-      expect(m).toHaveNthReturnedWith(2, 2)
+      const m = mock.fn(x => x);
+      m(1, 2, 3);
+      m(2, 3, 4);
+      expect(m).not.toHaveNthReturnedWith(2, 1);
+      expect(m).toHaveNthReturnedWith(2, 2);
     }
-  )
+  );
 
   assertAllFail(
     () => {
-      const m = mock.fn()
-      expect(m).toHaveNthReturnedWith(1, 1)
+      const m = mock.fn();
+      expect(m).toHaveNthReturnedWith(1, 1);
     },
     () => {
-      const m = mock.fn()
-      m(2)
-      expect(m).toHaveNthReturnedWith(1, 1)
+      const m = mock.fn();
+      m(2);
+      expect(m).toHaveNthReturnedWith(1, 1);
     }
-  )
-})
+  );
+});
 
 runTests();

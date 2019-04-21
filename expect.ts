@@ -1,40 +1,44 @@
-import * as matchers from "./matchers.ts";
+import * as builtInMatchers from "./matchers.ts";
+import {Matcher, Matchers} from './matchers.ts';
+
 import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
 
-export interface Expected {
-  toBe(candidate: any, msg?: string): void;
-  toEqual(candidate: any, msg?: string): void;
-  toBeTruthy(msg?: string): void;
-  toBeFalsy(msg?: string): void;
-  toBeDefined(msg?: string): void;
-  toBeInstanceOf(clazz: any, msg?: string): void;
-  toBeUndefined(msg?: string): void;
-  toBeNull(msg?: string): void;
-  toBeNaN(msg?: string): void;
+interface Expected {
+  toBe(candidate: any): void;
+  toEqual(candidate: any): void;
+  toBeTruthy(): void;
+  toBeFalsy(): void;
+  toBeDefined(): void;
+  toBeInstanceOf(clazz: any): void;
+  toBeUndefined(): void;
+  toBeNull(): void;
+  toBeNaN(): void;
   toMatch(pattern: RegExp | string): void;
-  toHaveProperty(propName: string, msg?: string): void;
-  toHaveLength(length: number, msg?: string): void;
-  toContain(item: any, msg?: string): void;
-  toThrow(error?: RegExp | string, msg?: string): void;
-  toBeGreaterThan(number: number, msg?: string): void;
-  toBeGreaterThanOrEqual(number: number, msg?: string): void;
-  toBeLessThan(number: number, msg?: string): void;
-  toBeLessThanOrEqual(number: number, msg?: string): void;
-  toHaveBeenCalled(msg?: string): void;
-  toHaveBeenCalledTimes(number: number, msg?: string): void;
-  toHaveBeenCalledWith(args: any[], msg?: string): void;
-  toHaveBeenLastCalledWith(args: any[], msg?: string): void;
-  toHaveBeenNthCalledWith(nthCall: number, args: any[], msg?: string): void;
-  toHaveReturned(msg?: string): void;
-  toHaveReturnedTimes(number: number, msg?: string): void;
-  toHaveReturnedWith(value: any, msg?: string): void;
-  toHaveLastReturnedWith(value: any, msg?: string): void;
-  toHaveNthReturnedWith(nthCall: number, value: any, msg?: string): void;
+  toHaveProperty(propName: string): void;
+  toHaveLength(length: number): void;
+  toContain(item: any): void;
+  toThrow(error?: RegExp | string): void;
+  toBeGreaterThan(number: number): void;
+  toBeGreaterThanOrEqual(number: number): void;
+  toBeLessThan(number: number): void;
+  toBeLessThanOrEqual(number: number): void;
+  toHaveBeenCalled(): void;
+  toHaveBeenCalledTimes(number: number): void;
+  toHaveBeenCalledWith(...args: any[]): void;
+  toHaveBeenLastCalledWith(...args: any[]): void;
+  toHaveBeenNthCalledWith(nthCall: number, ...args: any[]): void;
+  toHaveReturned(): void;
+  toHaveReturnedTimes(number: number): void;
+  toHaveReturnedWith(value: any): void;
+  toHaveLastReturnedWith(value: any): void;
+  toHaveNthReturnedWith(nthCall: number, value: any): void;
 
   not: Expected;
   resolves: Expected;
   rejects: Expected;
 }
+
+const matchers = {...builtInMatchers}
 
 export function expect(value: any): Expected {
   let isNot = false;
@@ -72,26 +76,26 @@ export function expect(value: any): Expected {
           return self;
         }
 
-        const matcher = matchers[name];
+        const matcher:Matcher = matchers[name];
         if (!matcher)
-          throw new TypeError(typeof name === 'string' ? `Matcher not found: ${name}` : 'Matcher not found')
+          throw new TypeError(
+            typeof name === "string"
+              ? `matcher not found: ${name}`
+              : "matcher not found"
+          );
 
         return (...args) => {
           function applyMatcher(value, args) {
             if (isNot) {
-              let thrown = null;
-              try {
-                matcher(value, ...args);
-              } catch (err) {
-                thrown = err;
-              }
-              if (thrown) {
-                if (!(thrown instanceof AssertionError)) throw thrown;
-              } else {
-                throw new AssertionError("expected it to not");
+              let result = matcher(value, ...args);
+              if (result.pass) {
+                throw new AssertionError('should not ' + result.message)
               }
             } else {
-              matcher(value, ...args);
+              let result = matcher(value, ...args);
+              if (!result.pass) {
+                throw new AssertionError(result.message)
+              }
             }
           }
 
@@ -100,8 +104,14 @@ export function expect(value: any): Expected {
             : applyMatcher(value, args);
         };
       }
-    }
+    } 
   );
 
   return self;
+}
+
+export function addMatchers(newMatchers:Matchers) : void {
+  for(let [key, matcher] of Object.entries(newMatchers)) {
+    matchers[key] = matcher
+  }
 }
