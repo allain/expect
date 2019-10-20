@@ -14,7 +14,7 @@ import {
   white,
   gray,
   bold
-} from "https://deno.land/std/colors/mod.ts";
+} from "https://deno.land/std/fmt/colors.ts";
 
 import * as mock from "./mock.ts";
 
