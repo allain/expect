@@ -1,9 +1,8 @@
-import { runTests, test } from "https://deno.land/std/testing/mod.ts";
 import {
   assert,
   assertEquals,
-  AssertionError
-} from "https://deno.land/std/testing/asserts.ts";
+  AssertionError,
+} from "https://deno.land/std@v0.41.0/testing/asserts.ts";
 
 import {
   toBe,
@@ -23,59 +22,59 @@ import {
   toHaveProperty,
   toContain,
   toThrow,
-  MatchResult
+  MatchResult,
 } from "./matchers.ts";
 
 function assertResult(actual: MatchResult, expected: MatchResult) {
   assertEquals(
     actual.pass,
     expected.pass,
-    `expected to be ${
-      expected.pass ? `pass but received: ${actual.message}` : "fail"
-    }`
+    `expected to be ${expected.pass
+      ? `pass but received: ${actual.message}`
+      : "fail"}`,
   );
   if (typeof expected.message !== "undefined") {
     assert(!!actual.message, "no message given");
     const colourless = actual.message.replace(
       /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-      ""
+      "",
     );
-    const trim = x => x.trim().replace(/\s*\n\s+/g, "\n");
+    const trim = (x: string) => x.trim().replace(/\s*\n\s+/g, "\n");
 
     assertEquals(trim(colourless), trim(expected.message));
   }
 }
 
-function assertResultPass(result) {
+function assertResultPass(result: any) {
   assertResult(result, { pass: true });
 }
 
-test(function toBePass() {
+Deno.test(function toBePass() {
   assertResultPass(toBe(10, 10));
 });
 
-test(function toBeFail() {
+Deno.test(function toBeFail() {
   assertResult(toBe(10, 20), {
     pass: false,
-    message: `expect(actual).toBe(expected)\n\n-   10\n+   20`
+    message: `expect(actual).toBe(expected)\n\n-   10\n+   20`,
   });
 
   assertResult(toBe({}, {}), {
     pass: false,
-    message: `expect(actual).toBe(expected)\n\n    Object {}`
+    message: `expect(actual).toBe(expected)\n\n    Object {}`,
   });
 });
 
-test(function toEqualPass() {
+Deno.test(function toEqualPass() {
   assertResultPass(toEqual({ a: 1 }, { a: 1 }));
   assertResultPass(toEqual(1, 1));
   assertResultPass(toEqual([1], [1]));
 });
 
-test(function toEqualFail() {
+Deno.test(function toEqualFail() {
   assertResult(toEqual(10, 20), {
     pass: false,
-    message: `expect(actual).toEqual(expected)\n\n-   10\n+   20`
+    message: `expect(actual).toEqual(expected)\n\n-   10\n+   20`,
   });
 
   assertResult(toEqual({ a: 1 }, { a: 2 }), {
@@ -84,139 +83,139 @@ test(function toEqualFail() {
             Object {
         -     "a": 1,
         +     "a": 2,
-            }`
+            }`,
   });
 });
 
-test(function toBeGreaterThanPass() {
+Deno.test(function toBeGreaterThanPass() {
   assertResultPass(toBeGreaterThan(2, 1));
 });
 
-test(function toBeGreaterThanFail() {
+Deno.test(function toBeGreaterThanFail() {
   assertResult(toBeGreaterThan(1, 2), {
     pass: false,
     message: `expect(actual).toBeGreaterThan(expected)
 
-            1 is not greater than 2`
+            1 is not greater than 2`,
   });
 });
 
-test(function toBeLessThanPass() {
+Deno.test(function toBeLessThanPass() {
   assertResultPass(toBeLessThan(1, 2));
 });
 
-test(function toBeLessThanFail() {
+Deno.test(function toBeLessThanFail() {
   assertResult(toBeLessThan(2, 1), {
     pass: false,
     message: `expect(actual).toBeLessThan(expected)
 
-            2 is not less than 1`
+            2 is not less than 1`,
   });
 });
 
-test(function toBeLessThanOrEqualPass() {
+Deno.test(function toBeLessThanOrEqualPass() {
   assertResultPass(toBeLessThanOrEqual(1, 2));
 });
 
-test(function toBeLessThanOrEqualFail() {
+Deno.test(function toBeLessThanOrEqualFail() {
   assertResult(toBeLessThanOrEqual(2, 1), {
     pass: false,
     message: `expect(actual).toBeLessThanOrEqual(expected)
 
-            2 is not less than or equal to 1`
+            2 is not less than or equal to 1`,
   });
 });
 
-test(function toBeTruthyPass() {
+Deno.test(function toBeTruthyPass() {
   assertResultPass(toBeTruthy(1));
   assertResultPass(toBeTruthy(true));
   assertResultPass(toBeTruthy([]));
 });
 
-test(function toBeTruthyFail() {
+Deno.test(function toBeTruthyFail() {
   assertResult(toBeTruthy(false), {
     pass: false,
     message: `expect(actual).toBeTruthy()
 
-              false is not truthy`
+              false is not truthy`,
   });
 });
 
-test(function toBeFalsyPass() {
+Deno.test(function toBeFalsyPass() {
   assertResultPass(toBeFalsy(0));
   assertResultPass(toBeFalsy(false));
   assertResultPass(toBeFalsy(null));
 });
 
-test(function toBeFalsyFail() {
+Deno.test(function toBeFalsyFail() {
   assertResult(toBeFalsy(true), {
     pass: false,
     message: `expect(actual).toBeFalsy()
 
-              true is not falsy`
+              true is not falsy`,
   });
 });
 
-test(function toBeDefinedPass() {
+Deno.test(function toBeDefinedPass() {
   assertResultPass(toBeDefined(1));
   assertResultPass(toBeDefined({}));
 });
 
-test(function toBeDefinedFail() {
+Deno.test(function toBeDefinedFail() {
   assertResult(toBeDefined(undefined), {
     pass: false,
     message: `expect(actual).toBeDefined()
 
-              undefined is not defined`
+              undefined is not defined`,
   });
 });
 
-test(function toBeUndefinedPass() {
+Deno.test(function toBeUndefinedPass() {
   assertResultPass(toBeUndefined(undefined));
 });
 
-test(function toBeUndefinedFail() {
+Deno.test(function toBeUndefinedFail() {
   assertResult(toBeUndefined(null), {
     pass: false,
     message: `expect(actual).toBeUndefined()
 
-              null is defined but should be undefined`
+              null is defined but should be undefined`,
   });
 });
 
-test(function toBeNullPass() {
+Deno.test(function toBeNullPass() {
   assertResultPass(toBeNull(null));
 });
 
-test(function toBeNullFail() {
+Deno.test(function toBeNullFail() {
   assertResult(toBeNull(10), {
     pass: false,
     message: `expect(actual).toBeNull()
 
-              10 should be null`
+              10 should be null`,
   });
 });
 
-test(function toBeNaNPass() {
+Deno.test(function toBeNaNPass() {
   assertResultPass(toBeNaN(NaN));
 });
 
-test(function toBeNaNFail() {
+Deno.test(function toBeNaNFail() {
   assertResult(toBeNaN(10), {
     pass: false,
     message: `expect(actual).toBeNaN()
 
-              10 should be NaN`
+              10 should be NaN`,
   });
 });
 
-test(function toBeInstanceOfPass() {
+Deno.test(function toBeInstanceOfPass() {
   class A {}
   const a = new A();
   assertResultPass(toBeInstanceOf(a, A));
 });
 
-test(function toBeNaNFail() {
+Deno.test(function toBeNaNFail() {
   class A {}
   class B {}
 
@@ -226,60 +225,62 @@ test(function toBeNaNFail() {
     pass: false,
     message: `expect(actual).toBeInstanceOf(expected)
 
-              expected B but received A {}`
+              expected B but received A {}`,
   });
 });
 
-test(function toBeMatchPass() {
+Deno.test(function toBeMatchPass() {
   assertResultPass(toMatch("hello", "hell"));
   assertResultPass(toMatch("hello", /^hell/));
 });
 
-test(function toBeMatchFail() {
+Deno.test(function toBeMatchFail() {
   assertResult(toMatch("yo", "hell"), {
     pass: false,
     message: `expect(actual).toMatch(expected)
 
-              expected "yo" to contain "hell"`
+              expected "yo" to contain "hell"`,
   });
 
   assertResult(toMatch("yo", /^hell/), {
     pass: false,
     message: `expect(actual).toMatch(expected)
 
-              "yo" did not match regex /^hell/`
+              "yo" did not match regex /^hell/`,
   });
 });
 
-test(function toBeHavePropertyPass() {
+Deno.test(function toBeHavePropertyPass() {
   assertResultPass(toHaveProperty({ a: 1 }, "a"));
 });
 
-test(function toBeHavePropertyFail() {
+Deno.test(function toBeHavePropertyFail() {
   assertResult(toHaveProperty({ a: 1 }, "b"), {
     pass: false,
-    message: `expect(actual).toHaveProperty(expected)\n\n    Object {\n"a": 1,\n} did not contain property "b"`
+    message:
+      `expect(actual).toHaveProperty(expected)\n\n    Object {\n"a": 1,\n} did not contain property "b"`,
   });
 });
 
-test(function toHaveLengthPass() {
+Deno.test(function toHaveLengthPass() {
   assertResultPass(toHaveLength([], 0));
   assertResultPass(toHaveLength([1, 2], 2));
   assertResultPass(toHaveLength({ length: 2 }, 2));
 });
 
-test(function toBeHaveLengthFail() {
+Deno.test(function toBeHaveLengthFail() {
   assertResult(toHaveLength([], 1), {
     pass: false,
-    message: `expect(actual).toHaveLength(expected)\n\n    expected array to have length 1 but was 0`
+    message:
+      `expect(actual).toHaveLength(expected)\n\n    expected array to have length 1 but was 0`,
   });
 });
 
-test(function toContainPass() {
+Deno.test(function toContainPass() {
   assertResultPass(toContain([1, 2], 2));
 });
 
-test(function toContainFail() {
+Deno.test(function toContainFail() {
   assertResult(toContain([2, 3], 1), {
     pass: false,
     message: `expect(actual).toContain(expected)
@@ -287,34 +288,34 @@ test(function toContainFail() {
     Array [
       2,
       3,
-    ] did not contain 1`
+    ] did not contain 1`,
   });
   assertResult(toContain(false, 1), {
     pass: false,
     message: `expect(actual).toContain(expected)
-        expected false to contain 1 but it is not an array`
+        expected false to contain 1 but it is not an array`,
   });
 });
 
-test(function toThrowPass() {
+Deno.test(function toThrowPass() {
   assertResultPass(
     toThrow(() => {
       throw new Error("TEST");
-    }, "TEST")
+    }, "TEST"),
   );
   assertResultPass(
     toThrow(() => {
       throw new Error("TEST");
-    }, /^TEST/)
+    }, /^TEST/),
   );
 });
 
-test(function toThrowFail() {
+Deno.test(function toThrowFail() {
   assertResult(toThrow(() => {}, "TEST"), {
     pass: false,
     message: `expect(actual).toThrow(expected)
     
-    expected [Function anonymous] to throw but it did not`
+    expected [Function anonymous] to throw but it did not`,
   });
 
   assertResult(
@@ -325,8 +326,8 @@ test(function toThrowFail() {
       pass: false,
       message: `expect(actual).toThrow(expected)
     
-    expected [Function anonymous] to throw error matching \"TEST\" but it threw Error: BLAH`
-    }
+    expected [Function anonymous] to throw error matching \"TEST\" but it threw Error: BLAH`,
+    },
   );
 
   assertResult(
@@ -337,8 +338,8 @@ test(function toThrowFail() {
       pass: false,
       message: `expect(actual).toThrow(expected)
     
-    expected [Function anonymous] to throw error matching /^TEST/ but it threw Error: BLAH`
-    }
+    expected [Function anonymous] to throw error matching /^TEST/ but it threw Error: BLAH`,
+    },
   );
 });
 
@@ -352,5 +353,3 @@ test(function toThrowFail() {
 //TODO(allain) - toHaveLastReturnedWith(value: any, expected: any): MatchResult
 //TODO(allain) - toHaveReturnedTimes(value: any, times: number): MatchResult
 //TODO(allain) - toHaveNthReturnedWith(value: any, nth: number, expected: any): MatchResult
-
-runTests();

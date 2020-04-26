@@ -1,7 +1,7 @@
 import * as builtInMatchers from "./matchers.ts";
-import {Matcher, Matchers} from './matchers.ts';
+import { Matcher, Matchers } from "./matchers.ts";
 
-import { AssertionError } from "https://deno.land/std/testing/asserts.ts";
+import { AssertionError } from "https://deno.land/std@v0.41.0/testing/asserts.ts";
 
 interface Expected {
   toBe(candidate: any): void;
@@ -38,12 +38,14 @@ interface Expected {
   rejects: Expected;
 }
 
-const matchers = {...builtInMatchers}
+const matchers: Record<any, Matcher> = {
+  ...builtInMatchers,
+};
 
 export function expect(value: any): Expected {
   let isNot = false;
   let isPromised = false;
-  const self = new Proxy(
+  const self: any = new Proxy(
     {},
     {
       get(_, name) {
@@ -53,65 +55,66 @@ export function expect(value: any): Expected {
         }
 
         if (name === "resolves") {
-          if (!(value instanceof Promise))
+          if (!(value instanceof Promise)) {
             throw new AssertionError("expected value must be a Promise");
+          }
 
           isPromised = true;
           return self;
         }
 
         if (name === "rejects") {
-          if (!(value instanceof Promise))
+          if (!(value instanceof Promise)) {
             throw new AssertionError("expected value must be a Promise");
+          }
 
           value = value.then(
-            value => {
+            (value) => {
               throw new AssertionError(
-                `Promise did not reject. resolved to ${value}`
+                `Promise did not reject. resolved to ${value}`,
               );
             },
-            err => err
+            (err) => err,
           );
           isPromised = true;
           return self;
         }
 
-        const matcher:Matcher = matchers[name];
-        if (!matcher)
+        const matcher: Matcher = matchers[name as any];
+        if (!matcher) {
           throw new TypeError(
             typeof name === "string"
               ? `matcher not found: ${name}`
-              : "matcher not found"
+              : "matcher not found",
           );
+        }
 
-        return (...args) => {
-          function applyMatcher(value, args) {
+        return (...args: any[]) => {
+          function applyMatcher(value: any, args: any[]) {
             if (isNot) {
               let result = matcher(value, ...args);
               if (result.pass) {
-                throw new AssertionError('should not ' + result.message)
+                throw new AssertionError("should not " + result.message);
               }
             } else {
               let result = matcher(value, ...args);
               if (!result.pass) {
-                throw new AssertionError(result.message)
+                throw new AssertionError(result.message || "Unknown error");
               }
             }
           }
 
           return isPromised
-            ? value.then(value => applyMatcher(value, args))
+            ? value.then((value: any) => applyMatcher(value, args))
             : applyMatcher(value, args);
         };
-      }
-    } 
+      },
+    },
   );
 
   return self;
 }
 
-export function addMatchers(newMatchers:Matchers) : void {
-  for(let [key, matcher] of Object.entries(newMatchers)) {
-    matchers[key] = matcher
-  }
+export function addMatchers(newMatchers: Matchers): void {
+  Object.assign(matchers, newMatchers);
 }

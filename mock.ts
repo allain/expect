@@ -21,7 +21,7 @@ export function fn(...stubs: Function[]) {
         returned,
         timestamp: Date.now(),
         returns: true,
-        throws: false
+        throws: false,
       });
       return returned;
     } catch (err) {
@@ -30,7 +30,7 @@ export function fn(...stubs: Function[]) {
         timestamp: Date.now(),
         returns: false,
         thrown: err,
-        throws: true
+        throws: true,
       });
       throw err;
     }
@@ -38,14 +38,14 @@ export function fn(...stubs: Function[]) {
 
   Object.defineProperty(f, MOCK_SYMBOL, {
     value: { calls },
-    writable: false
+    writable: false,
   });
 
   return f;
 }
 
 export function calls(f: Function): MockCall[] {
-  const mockInfo = f[MOCK_SYMBOL];
+  const mockInfo = (f as any)[MOCK_SYMBOL];
   if (!mockInfo) throw new Error("callCount only available on mock functions");
 
   return [...mockInfo.calls];

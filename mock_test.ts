@@ -1,9 +1,11 @@
-import { runTests, test } from "https://deno.land/std/testing/mod.ts";
-import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import {
+  assert,
+  assertEquals,
+} from "https://deno.land/std@v0.41.0/testing/asserts.ts";
 
 import * as mock from "./mock.ts";
 
-test(function canMockFunctions() {
+Deno.test(function canMockFunctions() {
   assertEquals(typeof mock.fn(), "function");
   const f = mock.fn();
   f(10);
@@ -12,18 +14,22 @@ test(function canMockFunctions() {
   const calls = mock.calls(f);
   assert(Array.isArray(calls));
   assertEquals(calls.length, 2);
-  assertEquals(calls.map(c => c.args), [[10], [20]]);
-  assertEquals(calls.map(c => c.returned), [undefined, undefined]);
+  assertEquals(calls.map((c: any) => c.args), [[10], [20]]);
+  assertEquals(calls.map((c: any) => c.returned), [undefined, undefined]);
 
-  assert(calls.map(c => typeof c.timestamp).every(t => t === "number"));
+  assert(
+    calls.map((c: any) => typeof c.timestamp).every((t: string) =>
+      t === "number"
+    ),
+  );
 });
 
-test(function mockFunctionTracksReturns() {
+Deno.test(function mockFunctionTracksReturns() {
   const f = mock.fn(
     () => 1,
     () => {
       throw new Error("TEST");
-    }
+    },
   );
   f();
   f();
@@ -33,8 +39,12 @@ test(function mockFunctionTracksReturns() {
   assert(!calls[1].returns);
   assert(calls[1].throws);
 });
-test(function mockFunctionCanHaveImplementations() {
-  const f = mock.fn(n => n, n => n * 2, n => n * 3);
+Deno.test(function mockFunctionCanHaveImplementations() {
+  const f = mock.fn(
+    (n: number) => n,
+    (n: number) => n * 2,
+    (n: number) => n * 3,
+  );
   f(1);
   f(1);
   f(1);
@@ -43,7 +53,8 @@ test(function mockFunctionCanHaveImplementations() {
 
   const calls = mock.calls(f);
   assertEquals(calls.length, 5);
-  assertEquals(calls.map(c => c.returned), [1, 2, 3, undefined, undefined]);
+  assertEquals(
+    calls.map((c: mock.MockCall) => c.returned),
+    [1, 2, 3, undefined, undefined],
+  );
 });
-
-runTests();
