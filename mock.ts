@@ -13,7 +13,12 @@ export function fn(...stubs: Function[]) {
   const calls: MockCall[] = [];
 
   const f = (...args: any[]) => {
-    const stub = stubs[calls.length] || stubs[stubs.length - 1];
+    const stub = stubs.length === 1
+      ? // keep reusing the first
+        stubs[0]
+      : // pick the exact mock for the current call
+        stubs[calls.length];
+
     try {
       const returned = stub ? stub(...args) : undefined;
       calls.push({
@@ -21,7 +26,7 @@ export function fn(...stubs: Function[]) {
         returned,
         timestamp: Date.now(),
         returns: true,
-        throws: false
+        throws: false,
       });
       return returned;
     } catch (err) {
@@ -30,7 +35,7 @@ export function fn(...stubs: Function[]) {
         timestamp: Date.now(),
         returns: false,
         thrown: err,
-        throws: true
+        throws: true,
       });
       throw err;
     }
@@ -38,14 +43,14 @@ export function fn(...stubs: Function[]) {
 
   Object.defineProperty(f, MOCK_SYMBOL, {
     value: { calls },
-    writable: false
+    writable: false,
   });
 
   return f;
 }
 
 export function calls(f: Function): MockCall[] {
-  const mockInfo = f[MOCK_SYMBOL];
+  const mockInfo = (f as any)[MOCK_SYMBOL];
   if (!mockInfo) throw new Error("callCount only available on mock functions");
 
   return [...mockInfo.calls];
