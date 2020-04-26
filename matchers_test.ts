@@ -61,7 +61,7 @@ Deno.test(function toBeFail() {
 
   assertResult(toBe({}, {}), {
     pass: false,
-    message: `expect(actual).toBe(expected)\n\n    Object {}`,
+    message: `expect(actual).toBe(expected)\n\n    {}`,
   });
 });
 
@@ -80,10 +80,8 @@ Deno.test(function toEqualFail() {
   assertResult(toEqual({ a: 1 }, { a: 2 }), {
     pass: false,
     message: `expect(actual).toEqual(expected)
-            Object {
-        -     "a": 1,
-        +     "a": 2,
-            }`,
+        -   { a: 1 }
+        +   { a: 2 }`,
   });
 });
 
@@ -239,14 +237,14 @@ Deno.test(function toBeMatchFail() {
     pass: false,
     message: `expect(actual).toMatch(expected)
 
-              expected "yo" to contain "hell"`,
+              expected yo to contain hell`,
   });
 
   assertResult(toMatch("yo", /^hell/), {
     pass: false,
     message: `expect(actual).toMatch(expected)
 
-              "yo" did not match regex /^hell/`,
+              yo did not match regex /^hell/`,
   });
 });
 
@@ -258,7 +256,7 @@ Deno.test(function toBeHavePropertyFail() {
   assertResult(toHaveProperty({ a: 1 }, "b"), {
     pass: false,
     message:
-      `expect(actual).toHaveProperty(expected)\n\n    Object {\n"a": 1,\n} did not contain property "b"`,
+      `expect(actual).toHaveProperty(expected)\n\n    { a: 1 } did not contain property b`,
   });
 });
 
@@ -285,10 +283,7 @@ Deno.test(function toContainFail() {
     pass: false,
     message: `expect(actual).toContain(expected)
     
-    Array [
-      2,
-      3,
-    ] did not contain 1`,
+    [ 2, 3 ] did not contain 1`,
   });
   assertResult(toContain(false, 1), {
     pass: false,
@@ -315,7 +310,7 @@ Deno.test(function toThrowFail() {
     pass: false,
     message: `expect(actual).toThrow(expected)
     
-    expected [Function anonymous] to throw but it did not`,
+    expected [Function] to throw but it did not`,
   });
 
   assertResult(
@@ -326,7 +321,7 @@ Deno.test(function toThrowFail() {
       pass: false,
       message: `expect(actual).toThrow(expected)
     
-    expected [Function anonymous] to throw error matching \"TEST\" but it threw Error: BLAH`,
+    expected [Function] to throw error matching TEST but it threw Error: BLAH`,
     },
   );
 
@@ -338,7 +333,7 @@ Deno.test(function toThrowFail() {
       pass: false,
       message: `expect(actual).toThrow(expected)
     
-    expected [Function anonymous] to throw error matching /^TEST/ but it threw Error: BLAH`,
+    expected [Function] to throw error matching /^TEST/ but it threw Error: BLAH`,
     },
   );
 });
