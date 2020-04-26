@@ -31,8 +31,10 @@ Deno.test(function mockFunctionTracksReturns() {
       throw new Error("TEST");
     },
   );
-  f();
-  f();
+  try {
+    f();
+    f();
+  } catch {}
   const calls = mock.calls(f);
   assert(calls[0].returns);
   assert(!calls[0].throws);
