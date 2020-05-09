@@ -456,7 +456,7 @@ Deno.test({
   fn: () => {
     const m = mock.fn();
     m(10);
-    assertResultPass(toHaveBeenCalled(m))
+    assertResultPass(toHaveBeenCalled(m));
   },
 });
 
@@ -469,7 +469,7 @@ Deno.test({
       message: `expect(actual).toHaveBeenCalled()
       
                 [Function: f] was not called`,
-    })
+    });
   },
 });
 
@@ -479,7 +479,7 @@ Deno.test({
     const m = mock.fn();
     m(10);
     m(12);
-    assertResultPass(toHaveBeenCalledTimes(m, 2))
+    assertResultPass(toHaveBeenCalledTimes(m, 2));
   },
 });
 
@@ -493,7 +493,7 @@ Deno.test({
       message: `expect(actual).toHaveBeenCalledTimes(expected)
       
                 expected 2 calls but was called: 1`,
-    })
+    });
   },
 });
 
@@ -501,8 +501,8 @@ Deno.test({
   name: "toHaveBeenCalledWithPass",
   fn: () => {
     const m = mock.fn();
-    m(1, 'a');
-    assertResultPass(toHaveBeenCalledWith(m, 1, 'a'))
+    m(1, "a");
+    assertResultPass(toHaveBeenCalledWith(m, 1, "a"));
   },
 });
 
@@ -510,13 +510,13 @@ Deno.test({
   name: "toHaveBeenCalledWithFail",
   fn: () => {
     const m = mock.fn();
-    m(1, 'a');
-    assertResult(toHaveBeenCalledWith(m, 2, 'b'), {
+    m(1, "a");
+    assertResult(toHaveBeenCalledWith(m, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenCalledWith(expected)
       
                 function was not called with: [ 2, "b" ]`,
-    })
+    });
   },
 });
 
@@ -524,10 +524,10 @@ Deno.test({
   name: "toHaveBeenLastCalledWithPass",
   fn: () => {
     const m = mock.fn();
-    m(1, 'a');
-    m(2, 'b');
-    m(3, 'c');
-    assertResultPass(toHaveBeenLastCalledWith(m, 3, 'c'))
+    m(1, "a");
+    m(2, "b");
+    m(3, "c");
+    assertResultPass(toHaveBeenLastCalledWith(m, 3, "c"));
   },
 });
 
@@ -535,15 +535,15 @@ Deno.test({
   name: "toHaveBeenLastCalledWithPass",
   fn: () => {
     const m = mock.fn();
-    m(1, 'a');
-    m(2, 'b');
-    m(3, 'c');
-    assertResult(toHaveBeenLastCalledWith(m, 2, 'b'), {
+    m(1, "a");
+    m(2, "b");
+    m(3, "c");
+    assertResult(toHaveBeenLastCalledWith(m, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenLastCalledWith(...expected)
       
                 expect last call args to be 2,b but was: 3,c`,
-    })
+    });
   },
 });
 
