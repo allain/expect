@@ -32,6 +32,7 @@ import {
   toHaveReturned,
   toHaveLastReturnedWith,
   toHaveReturnedTimes,
+  toHaveNthReturnedWith,
 } from "./matchers.ts";
 
 function assertResult(actual: MatchResult, expected: MatchResult) {
@@ -686,4 +687,32 @@ Deno.test({
   },
 });
 
-//TODO(allain) - toHaveNthReturnedWith(value: any, nth: number, expected: any): MatchResult
+Deno.test({
+  name: "toHaveNthReturnedWithPass",
+  fn: () => {
+    const m = mock.fn((n: number) => n);
+    m(1);
+    m(2);
+    m(3);
+    const nthCall = 2;
+    assertResultPass(toHaveNthReturnedWith(m, nthCall, 2));
+  },
+});
+
+Deno.test({
+  name: "toHaveNthReturnedWithFail",
+  fn: () => {
+    const m = mock.fn((n: number) => n);
+    m(1);
+    m(2);
+    m(3);
+    assertResult(toHaveNthReturnedWith(m, 2, 1), {
+      pass: false,
+      message: `expected 2th call to return 1 but returned: 2`,
+    });
+    assertResult(toHaveNthReturnedWith(m, 9, 1), {
+      pass: false,
+      message: `9 calls were now made`,
+    });
+  },
+});
