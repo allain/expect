@@ -29,6 +29,7 @@ import {
   toHaveBeenLastCalledWith,
   toHaveBeenNthCalledWith,
   toHaveReturnedWith,
+  toHaveReturned,
 } from "./matchers.ts";
 
 function assertResult(actual: MatchResult, expected: MatchResult) {
@@ -597,6 +598,28 @@ Deno.test({
       message: `expect(actual).toHaveReturnedWith(expected)
       
                 function did not return: false`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedPass",
+  fn: () => {
+    const m = mock.fn(() => true);
+    m();
+    assertResultPass(toHaveReturned(m));
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedFail",
+  fn: () => {
+    const m = mock.fn(() => true);
+    assertResult(toHaveReturned(m), {
+      pass: false,
+      message: `expect(actual).toHaveReturned()
+
+                expected function to return but it never did`,
     });
   },
 });
