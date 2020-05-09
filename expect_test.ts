@@ -2,7 +2,7 @@ import {
   assertEquals,
   assertThrows,
   AssertionError,
-} from "https://deno.land/std@v0.41.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.50.0/testing/asserts.ts";
 
 import { expect, addMatchers } from "./expect.ts";
 import * as mock from "./mock.ts";
@@ -43,597 +43,700 @@ async function assertAllFail(...fns: Function[]) {
   }
 }
 
-Deno.test(function exportsFunction() {
-  assertEquals(typeof expect, "function");
+Deno.test({
+  name: "exportsFunction",
+  fn: () => {
+    assertEquals(typeof expect, "function");
+  },
 });
 
-Deno.test(function throwsWhenNoMatcherFound() {
-  assertThrows(
-    //@ts-ignore
-    () => expect(true).toBeFancy(),
-    TypeError,
-    "matcher not found: toBeFancy",
-  );
+Deno.test({
+  name: "throwsWhenNoMatcherFound",
+  fn: () => {
+    assertThrows(
+      //@ts-ignore
+      () => expect(true).toBeFancy(),
+      TypeError,
+      "matcher not found: toBeFancy",
+    );
+  },
 });
 
-Deno.test(function allowsExtendingMatchers() {
-  addMatchers({
-    toBeFancy(value: any) {
-      if (value === "fancy") {
-        return { pass: true };
-      } else {
-        return { pass: false, message: "was not fancy" };
-      }
-    },
-  });
+Deno.test({
+  name: "allowsExtendingMatchers",
+  fn: () => {
+    addMatchers({
+      toBeFancy(value: any) {
+        if (value === "fancy") {
+          return { pass: true };
+        } else {
+          return { pass: false, message: "was not fancy" };
+        }
+      },
+    });
 
-  // @ts-ignore
-  assertPass(() => expect("fancy").toBeFancy());
+    // @ts-ignore
+    assertPass(() => expect("fancy").toBeFancy());
+  },
 });
 
-Deno.test(async function toBe() {
-  const obj = {};
-  assertEquals(typeof expect(obj).toBe, "function");
-  await assertAllPass(
-    () => expect(obj).toBe(obj),
-    () => expect(obj).not.toBe({}),
-    () => expect(Promise.resolve(1)).resolves.toBe(1),
-    () => expect(Promise.reject(1)).rejects.toBe(1),
-  );
+Deno.test({
+  name: "toBe",
+  fn: async () => {
+    const obj = {};
+    assertEquals(typeof expect(obj).toBe, "function");
+    await assertAllPass(
+      () => expect(obj).toBe(obj),
+      () => expect(obj).not.toBe({}),
+      () => expect(Promise.resolve(1)).resolves.toBe(1),
+      () => expect(Promise.reject(1)).rejects.toBe(1),
+    );
 
-  await assertFail(() => expect(obj).toBe({}));
-  await assertFail(() => expect(obj).not.toBe(obj));
+    await assertFail(() => expect(obj).toBe({}));
+    await assertFail(() => expect(obj).not.toBe(obj));
+  },
 });
 
-Deno.test(async function toEqual() {
-  const obj = {};
+Deno.test({
+  name: "toEqual",
+  fn: async () => {
+    const obj = {};
 
-  await assertAllPass(
-    () => expect(1).toEqual(1),
-    () => expect(obj).toEqual({}),
-    () => expect(obj).toEqual(obj),
-    () => expect({ a: 1 }).toEqual({ a: 1 }),
-    () => expect([1]).toEqual([1]),
-    () => expect(Promise.resolve(1)).resolves.toEqual(1),
-    () => expect(Promise.reject(1)).rejects.toEqual(1),
-  );
+    await assertAllPass(
+      () => expect(1).toEqual(1),
+      () => expect(obj).toEqual({}),
+      () => expect(obj).toEqual(obj),
+      () => expect({ a: 1 }).toEqual({ a: 1 }),
+      () => expect([1]).toEqual([1]),
+      () => expect(Promise.resolve(1)).resolves.toEqual(1),
+      () => expect(Promise.reject(1)).rejects.toEqual(1),
+    );
 
-  await assertAllFail(
-    () => expect(1).toEqual(2),
-    () => expect(1).toEqual(true),
-    () => expect({}).toEqual(true),
-    () => expect(1).not.toEqual(1),
-    () => expect(true).not.toEqual(true),
-  );
+    await assertAllFail(
+      () => expect(1).toEqual(2),
+      () => expect(1).toEqual(true),
+      () => expect({}).toEqual(true),
+      () => expect(1).not.toEqual(1),
+      () => expect(true).not.toEqual(true),
+    );
+  },
 });
 
-Deno.test(async function resolves() {
-  const resolves = expect(Promise.resolve(true)).resolves;
-  for (let method of ["toEqual", "toBe", "toBeTruthy", "toBeFalsy"]) {
-    assertEquals(typeof (resolves as any)[method], "function", `missing ${method}`);
-  }
+Deno.test({
+  name: "resolves",
+  fn: async () => {
+    const resolves = expect(Promise.resolve(true)).resolves;
+    for (let method of ["toEqual", "toBe", "toBeTruthy", "toBeFalsy"]) {
+      assertEquals(
+        typeof (resolves as any)[method],
+        "function",
+        `missing ${method}`,
+      );
+    }
+  },
 });
 
-Deno.test(async function rejects() {
-  const rejects = expect(Promise.reject(true)).rejects;
-  for (
-    let method of ["toEqual", "toBe", "toBeTruthy", "toBeFalsy"]
-  ) {
-    assertEquals(typeof (rejects as any)[method], "function");
-  }
+Deno.test({
+  name: "rejects",
+  fn: async () => {
+    const rejects = expect(Promise.reject(true)).rejects;
+    for (
+      let method of ["toEqual", "toBe", "toBeTruthy", "toBeFalsy"]
+    ) {
+      assertEquals(typeof (rejects as any)[method], "function");
+    }
+  },
 });
 
-Deno.test(async function toBeDefined() {
-  await assertAllPass(
-    () => expect(true).toBeDefined(),
-    () => expect({}).toBeDefined(),
-    () => expect([]).toBeDefined(),
-    () => expect(undefined).not.toBeDefined(),
-    () => expect(Promise.resolve({})).resolves.toBeDefined(),
-    () => expect(Promise.reject({})).rejects.toBeDefined(),
-  );
+Deno.test({
+  name: "toBeDefined",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(true).toBeDefined(),
+      () => expect({}).toBeDefined(),
+      () => expect([]).toBeDefined(),
+      () => expect(undefined).not.toBeDefined(),
+      () => expect(Promise.resolve({})).resolves.toBeDefined(),
+      () => expect(Promise.reject({})).rejects.toBeDefined(),
+    );
 
-  await assertAllFail(
-    () => expect(undefined).toBeDefined(),
-    () => expect(true).not.toBeDefined(),
-  );
+    await assertAllFail(
+      () => expect(undefined).toBeDefined(),
+      () => expect(true).not.toBeDefined(),
+    );
+  },
 });
 
-Deno.test(async function toBeUndefined() {
-  await assertAllPass(
-    () => expect(undefined).toBeUndefined(),
-    () => expect(null).not.toBeUndefined(),
-    () => expect(Promise.resolve(undefined)).resolves.toBeUndefined(),
-    () => expect(Promise.reject(undefined)).rejects.toBeUndefined(),
-  );
+Deno.test({
+  name: "toBeUndefined",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(undefined).toBeUndefined(),
+      () => expect(null).not.toBeUndefined(),
+      () => expect(Promise.resolve(undefined)).resolves.toBeUndefined(),
+      () => expect(Promise.reject(undefined)).rejects.toBeUndefined(),
+    );
 
-  await assertAllFail(
-    () => expect(null).toBeUndefined(),
-    () => expect(undefined).not.toBeUndefined(),
-    () => expect(false).toBeUndefined(),
-  );
+    await assertAllFail(
+      () => expect(null).toBeUndefined(),
+      () => expect(undefined).not.toBeUndefined(),
+      () => expect(false).toBeUndefined(),
+    );
+  },
 });
 
-Deno.test(async function toBeTruthy() {
-  await assertAllPass(
-    () => expect(true).toBeTruthy(),
-    () => expect(false).not.toBeTruthy(),
-    () => expect(Promise.resolve(true)).resolves.toBeTruthy(),
-    () => expect(Promise.reject(true)).rejects.toBeTruthy(),
-  );
+Deno.test({
+  name: "toBeTruthy",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(true).toBeTruthy(),
+      () => expect(false).not.toBeTruthy(),
+      () => expect(Promise.resolve(true)).resolves.toBeTruthy(),
+      () => expect(Promise.reject(true)).rejects.toBeTruthy(),
+    );
 
-  await assertAllFail(
-    () => expect(false).toBeTruthy(),
-    () => expect(true).not.toBeTruthy(),
-  );
+    await assertAllFail(
+      () => expect(false).toBeTruthy(),
+      () => expect(true).not.toBeTruthy(),
+    );
+  },
 });
 
-Deno.test(async function toBeFalsy() {
-  await assertAllPass(
-    () => expect(false).toBeFalsy(),
-    () => expect(true).not.toBeFalsy(),
-    () => expect(Promise.resolve(false)).resolves.toBeFalsy(),
-    () => expect(Promise.reject(false)).rejects.toBeFalsy(),
-  );
-  await assertAllFail(
-    () => expect(true).toBeFalsy(),
-    () => expect(false).not.toBeFalsy(),
-  );
+Deno.test({
+  name: "toBeFalsy",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(false).toBeFalsy(),
+      () => expect(true).not.toBeFalsy(),
+      () => expect(Promise.resolve(false)).resolves.toBeFalsy(),
+      () => expect(Promise.reject(false)).rejects.toBeFalsy(),
+    );
+    await assertAllFail(
+      () => expect(true).toBeFalsy(),
+      () => expect(false).not.toBeFalsy(),
+    );
+  },
 });
 
-Deno.test(async function toBeGreaterThan() {
-  await assertAllPass(
-    () => expect(2).toBeGreaterThan(1),
-    () => expect(1).not.toBeGreaterThan(2),
-    () => expect(Promise.resolve(2)).resolves.toBeGreaterThan(1),
-    () => expect(Promise.reject(2)).rejects.toBeGreaterThan(1),
-  );
+Deno.test({
+  name: "toBeGreaterThan",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(2).toBeGreaterThan(1),
+      () => expect(1).not.toBeGreaterThan(2),
+      () => expect(Promise.resolve(2)).resolves.toBeGreaterThan(1),
+      () => expect(Promise.reject(2)).rejects.toBeGreaterThan(1),
+    );
 
-  await assertAllFail(
-    () => expect(1).toBeGreaterThan(1),
-    () => expect(1).toBeGreaterThan(2),
-    () => expect(2).not.toBeGreaterThan(1),
-  );
+    await assertAllFail(
+      () => expect(1).toBeGreaterThan(1),
+      () => expect(1).toBeGreaterThan(2),
+      () => expect(2).not.toBeGreaterThan(1),
+    );
+  },
 });
 
-Deno.test(async function toBeLessThan() {
-  await assertAllPass(
-    () => expect(1).toBeLessThan(2),
-    () => expect(2).not.toBeLessThan(1),
-    () => expect(Promise.resolve(1)).resolves.toBeLessThan(2),
-    () => expect(Promise.reject(1)).rejects.toBeLessThan(2),
-  );
+Deno.test({
+  name: "toBeLessThan",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(1).toBeLessThan(2),
+      () => expect(2).not.toBeLessThan(1),
+      () => expect(Promise.resolve(1)).resolves.toBeLessThan(2),
+      () => expect(Promise.reject(1)).rejects.toBeLessThan(2),
+    );
 
-  await assertAllFail(
-    () => expect(1).toBeLessThan(1),
-    () => expect(2).toBeLessThan(1),
-    () => expect(1).not.toBeLessThan(2),
-  );
+    await assertAllFail(
+      () => expect(1).toBeLessThan(1),
+      () => expect(2).toBeLessThan(1),
+      () => expect(1).not.toBeLessThan(2),
+    );
+  },
 });
 
-Deno.test(async function toBeGreaterThanOrEqual() {
-  await assertAllPass(
-    () => expect(2).toBeGreaterThanOrEqual(1),
-    () => expect(1).toBeGreaterThanOrEqual(1),
-    () => expect(1).not.toBeGreaterThanOrEqual(2),
-    () => expect(Promise.resolve(2)).resolves.toBeGreaterThanOrEqual(2),
-    () => expect(Promise.reject(2)).rejects.toBeGreaterThanOrEqual(2),
-  );
+Deno.test({
+  name: "toBeGreaterThanOrEqual",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(2).toBeGreaterThanOrEqual(1),
+      () => expect(1).toBeGreaterThanOrEqual(1),
+      () => expect(1).not.toBeGreaterThanOrEqual(2),
+      () => expect(Promise.resolve(2)).resolves.toBeGreaterThanOrEqual(2),
+      () => expect(Promise.reject(2)).rejects.toBeGreaterThanOrEqual(2),
+    );
 
-  await assertAllFail(
-    () => expect(1).toBeGreaterThanOrEqual(2),
-    () => expect(2).not.toBeGreaterThanOrEqual(1),
-  );
+    await assertAllFail(
+      () => expect(1).toBeGreaterThanOrEqual(2),
+      () => expect(2).not.toBeGreaterThanOrEqual(1),
+    );
+  },
 });
 
-Deno.test(async function toBeLessThanOrEqual() {
-  await assertAllPass(
-    () => expect(1).toBeLessThanOrEqual(2),
-    () => expect(1).toBeLessThanOrEqual(1),
-    () => expect(2).not.toBeLessThanOrEqual(1),
-    () => expect(Promise.resolve(1)).resolves.toBeLessThanOrEqual(2),
-    () => expect(Promise.reject(1)).rejects.toBeLessThanOrEqual(2),
-  );
-  await assertAllFail(
-    () => expect(2).toBeLessThanOrEqual(1),
-    () => expect(1).not.toBeLessThanOrEqual(1),
-    () => expect(1).not.toBeLessThanOrEqual(2),
-  );
+Deno.test({
+  name: "toBeLessThanOrEqual",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(1).toBeLessThanOrEqual(2),
+      () => expect(1).toBeLessThanOrEqual(1),
+      () => expect(2).not.toBeLessThanOrEqual(1),
+      () => expect(Promise.resolve(1)).resolves.toBeLessThanOrEqual(2),
+      () => expect(Promise.reject(1)).rejects.toBeLessThanOrEqual(2),
+    );
+    await assertAllFail(
+      () => expect(2).toBeLessThanOrEqual(1),
+      () => expect(1).not.toBeLessThanOrEqual(1),
+      () => expect(1).not.toBeLessThanOrEqual(2),
+    );
+  },
 });
 
-Deno.test(async function toBeNull() {
-  await assertAllPass(
-    () => expect(null).toBeNull(),
-    () => expect(undefined).not.toBeNull(),
-    () => expect(false).not.toBeNull(),
-    () => expect(Promise.resolve(null)).resolves.toBeNull(),
-    () => expect(Promise.reject(null)).rejects.toBeNull(),
-  );
+Deno.test({
+  name: "toBeNull",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(null).toBeNull(),
+      () => expect(undefined).not.toBeNull(),
+      () => expect(false).not.toBeNull(),
+      () => expect(Promise.resolve(null)).resolves.toBeNull(),
+      () => expect(Promise.reject(null)).rejects.toBeNull(),
+    );
 
-  await assertAllFail(
-    () => expect({}).toBeNull(),
-    () => expect(null).not.toBeNull(),
-    () => expect(undefined).toBeNull(),
-  );
+    await assertAllFail(
+      () => expect({}).toBeNull(),
+      () => expect(null).not.toBeNull(),
+      () => expect(undefined).toBeNull(),
+    );
+  },
 });
 
-Deno.test(async function toBeInstanceOf() {
-  class A {}
-  class B {}
+Deno.test({
+  name: "toBeInstanceOf",
+  fn: async () => {
+    class A {}
+    class B {}
 
-  await assertAllPass(
-    () => expect(new A()).toBeInstanceOf(A),
-    () => expect(new A()).not.toBeInstanceOf(B),
-  );
+    await assertAllPass(
+      () => expect(new A()).toBeInstanceOf(A),
+      () => expect(new A()).not.toBeInstanceOf(B),
+    );
 
-  await assertAllFail(
-    () => expect({}).toBeInstanceOf(A),
-    () => expect(null).toBeInstanceOf(A),
-  );
+    await assertAllFail(
+      () => expect({}).toBeInstanceOf(A),
+      () => expect(null).toBeInstanceOf(A),
+    );
+  },
 });
 
-Deno.test(async function toBeNaN() {
-  await assertAllPass(
-    () => expect(NaN).toBeNaN(),
-    () => expect(10).not.toBeNaN(),
-    () => expect(Promise.resolve(NaN)).resolves.toBeNaN(),
-  );
+Deno.test({
+  name: "toBeNaN",
+  fn: async () => {
+    await assertAllPass(
+      () => expect(NaN).toBeNaN(),
+      () => expect(10).not.toBeNaN(),
+      () => expect(Promise.resolve(NaN)).resolves.toBeNaN(),
+    );
 
-  await assertAllFail(() => expect(10).toBeNaN(), () => expect(10).toBeNaN());
+    await assertAllFail(() => expect(10).toBeNaN(), () => expect(10).toBeNaN());
+  },
 });
 
-Deno.test(async function toBeMatch() {
-  await assertAllPass(
-    () => expect("hello").toMatch(/^hell/),
-    () => expect("hello").toMatch("hello"),
-    () => expect("hello").toMatch("hell"),
-  );
+Deno.test({
+  name: "toBeMatch",
+  fn: async () => {
+    await assertAllPass(
+      () => expect("hello").toMatch(/^hell/),
+      () => expect("hello").toMatch("hello"),
+      () => expect("hello").toMatch("hell"),
+    );
 
-  await assertAllFail(() => expect("yo").toMatch(/^hell/));
+    await assertAllFail(() => expect("yo").toMatch(/^hell/));
+  },
 });
 
-Deno.test(async function toHaveProperty() {
-  await assertAllPass(() => expect({ a: "10" }).toHaveProperty("a"));
+Deno.test({
+  name: "toHaveProperty",
+  fn: async () => {
+    await assertAllPass(() => expect({ a: "10" }).toHaveProperty("a"));
 
-  await assertAllFail(() => expect({ a: 1 }).toHaveProperty("b"));
+    await assertAllFail(() => expect({ a: 1 }).toHaveProperty("b"));
+  },
 });
 
-Deno.test(async function toHaveLength() {
-  await assertAllPass(
-    () => expect([1, 2]).toHaveLength(2),
-    () => expect({ length: 10 }).toHaveLength(10),
-  );
+Deno.test({
+  name: "toHaveLength",
+  fn: async () => {
+    await assertAllPass(
+      () => expect([1, 2]).toHaveLength(2),
+      () => expect({ length: 10 }).toHaveLength(10),
+    );
 
-  await assertAllFail(() => expect([]).toHaveLength(10));
+    await assertAllFail(() => expect([]).toHaveLength(10));
+  },
 });
 
-Deno.test(async function toContain() {
-  await assertAllPass(
-    () => expect([1, 2, 3]).toContain(2),
-    () => expect([]).not.toContain(2),
-  );
+Deno.test({
+  name: "toContain",
+  fn: async () => {
+    await assertAllPass(
+      () => expect([1, 2, 3]).toContain(2),
+      () => expect([]).not.toContain(2),
+    );
 
-  await assertAllFail(
-    () => expect([1, 2, 3]).toContain(4),
-    () => expect([]).toContain(4),
-  );
+    await assertAllFail(
+      () => expect([1, 2, 3]).toContain(4),
+      () => expect([]).toContain(4),
+    );
+  },
 });
 
-Deno.test(async function toThrow() {
-  await assertAllPass(
-    () =>
-      expect(() => {
-        throw new Error("TEST");
-      }).toThrow("TEST"),
-    () => expect(Promise.reject(new Error("TEST"))).rejects.toThrow("TEST"),
-  );
+Deno.test({
+  name: "toThrow",
+  fn: async () => {
+    await assertAllPass(
+      () =>
+        expect(() => {
+          throw new Error("TEST");
+        }).toThrow("TEST"),
+      () => expect(Promise.reject(new Error("TEST"))).rejects.toThrow("TEST"),
+    );
 
-  await assertAllFail(() => expect(() => true).toThrow());
+    await assertAllFail(() => expect(() => true).toThrow());
+  },
 });
 
-Deno.test(async function toHaveBeenCalled() {
-  assertAllPass(
-    () => {
+Deno.test({
+  name: "toHaveBeenCalled",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m(10);
+        m(20);
+        expect(m).toHaveBeenCalled();
+      },
+      () => {
+        const m = mock.fn();
+        expect(m).not.toHaveBeenCalled();
+      },
+    );
+
+    await assertAllFail(() => {
       const m = mock.fn();
-      m(10);
-      m(20);
       expect(m).toHaveBeenCalled();
-    },
-    () => {
-      const m = mock.fn();
-      expect(m).not.toHaveBeenCalled();
-    },
-  );
-
-  assertAllFail(() => {
-    const m = mock.fn();
-    expect(m).toHaveBeenCalled();
-  });
+    });
+  },
 });
 
-Deno.test(function toHaveBeenCalledTimes() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveBeenCalledTimes(0);
-    },
-    () => {
-      const m = mock.fn();
-      m();
-      m();
-      expect(m).toHaveBeenCalledTimes(2);
-    },
-  );
-
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveBeenCalledTimes(1);
-    },
-    () => {
-      const m = mock.fn();
-      m();
-      m();
-      expect(m).toHaveBeenCalledTimes(3);
-    },
-  );
-});
-
-Deno.test(function toHaveBeenCalledWith() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      m(1, 2, 3);
-      expect(m).toHaveBeenCalledWith(1, 2, 3);
-    },
-    () => {
-      const m = mock.fn();
-      m(1, 2, 3);
-      m(2, 3, 4);
-      expect(m).toHaveBeenCalledWith(1, 2, 3);
-      expect(m).toHaveBeenCalledWith(2, 3, 4);
-    },
-  );
-
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveBeenCalledWith(1);
-    },
-    () => {
-      const m = mock.fn();
-      m(2);
-      expect(m).toHaveBeenCalledWith(1);
-    },
-  );
-});
-
-Deno.test(function toHaveBeenLastCalledWith() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      m(1, 2, 3);
-      expect(m).toHaveBeenLastCalledWith(1, 2, 3);
-    },
-    () => {
-      const m = mock.fn();
-      m(1, 2, 3);
-      m(2, 3, 4);
-      expect(m).not.toHaveBeenLastCalledWith(1, 2, 3);
-      expect(m).toHaveBeenLastCalledWith(2, 3, 4);
-    },
-  );
-
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveBeenLastCalledWith(1);
-    },
-    () => {
-      const m = mock.fn();
-      m(2);
-      expect(m).toHaveBeenLastCalledWith(1);
-    },
-  );
-});
-
-Deno.test(function toHaveBeenNthCalledWith() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      m(1, 2, 3);
-      expect(m).toHaveBeenNthCalledWith(1, 1, 2, 3);
-    },
-    () => {
-      const m = mock.fn();
-      m(1, 2, 3);
-      m(2, 3, 4);
-      expect(m).not.toHaveBeenNthCalledWith(2, 1, 2, 3);
-      expect(m).toHaveBeenNthCalledWith(2, 2, 3, 4);
-    },
-  );
-
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveBeenNthCalledWith(1, 1, 2);
-    },
-    () => {
-      const m = mock.fn();
-      m(2);
-      expect(m).toHaveBeenNthCalledWith(1, 1);
-    },
-  );
-});
-
-Deno.test(function toHaveReturnedWith() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      m();
-      expect(m).toHaveReturnedWith(undefined);
-    },
-    () => {
-      const m = mock.fn(() => true);
-      m();
-      expect(m).not.toHaveReturnedWith(false);
-      expect(m).toHaveReturnedWith(true);
-    },
-    () => {
-      const m = mock.fn(() => {
-        throw new Error("TEST");
-      });
-      try {
+Deno.test({
+  name: "toHaveBeenCalledTimes",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveBeenCalledTimes(0);
+      },
+      () => {
+        const m = mock.fn();
         m();
-      } catch (err) {}
-      expect(m).not.toHaveReturnedWith(10);
-    },
-  );
-
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveReturnedWith(1);
-    },
-    () => {
-      const m = mock.fn();
-      m(2);
-      expect(m).toHaveReturnedWith(1);
-    },
-  );
-});
-
-Deno.test(function toHaveReturnedTimes() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      m();
-      expect(m).toHaveReturnedTimes(1);
-    },
-    () => {
-      const m = mock.fn(() => true);
-      expect(m).toHaveReturnedTimes(0);
-    },
-    () => {
-      const m = mock.fn(() => {
-        throw new Error("TEST");
-      });
-      try {
         m();
-      } catch (err) {}
-      expect(m).toHaveReturnedTimes(0);
-    },
-  );
+        expect(m).toHaveBeenCalledTimes(2);
+      },
+    );
 
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveReturnedTimes(1);
-    },
-    () => {
-      const m = mock.fn();
-      m(2);
-      expect(m).not.toHaveReturnedTimes(1);
-    },
-  );
-});
-
-Deno.test(function toHaveReturned() {
-  assertAllPass(
-    () => {
-      const m = mock.fn();
-      m();
-      expect(m).toHaveReturned();
-    },
-    () => {
-      const m = mock.fn();
-      expect(m).not.toHaveReturned();
-    },
-    () => {
-      const m = mock.fn(() => {
-        throw new Error("TEST");
-      });
-      try {
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveBeenCalledTimes(1);
+      },
+      () => {
+        const m = mock.fn();
         m();
-      } catch (err) {}
-      expect(m).not.toHaveReturned();
-    },
-  );
-
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveReturned();
-    },
-    () => {
-      const m = mock.fn();
-      m();
-      expect(m).not.toHaveReturned();
-    },
-    () => {
-      const m = mock.fn(() => {
-        throw new Error("TEST");
-      });
-      m();
-      expect(m).not.toHaveReturned();
-    },
-  );
+        m();
+        expect(m).toHaveBeenCalledTimes(3);
+      },
+    );
+  },
 });
 
-Deno.test(function toHaveLastReturnedWith() {
-  assertAllPass(
-    () => {
-      const m = mock.fn((x: number) => x);
-      m(1);
-      m(2);
-      expect(m).toHaveLastReturnedWith(2);
-    },
-    () => {
-      const m = mock.fn((x: number) => x);
-      m(1);
-      m(2);
-      expect(m).toHaveLastReturnedWith(2);
-    },
-  );
+Deno.test({
+  name: "toHaveBeenCalledWith",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m(1, 2, 3);
+        expect(m).toHaveBeenCalledWith(1, 2, 3);
+      },
+      () => {
+        const m = mock.fn();
+        m(1, 2, 3);
+        m(2, 3, 4);
+        expect(m).toHaveBeenCalledWith(1, 2, 3);
+        expect(m).toHaveBeenCalledWith(2, 3, 4);
+      },
+    );
 
-  assertAllFail(
-    () => {
-      const m = mock.fn((x: number) => x);
-      expect(m).toHaveLastReturnedWith(1);
-    },
-    () => {
-      const m = mock.fn((x: number) => x);
-      m(2);
-      expect(m).toHaveLastReturnedWith(1);
-    },
-  );
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveBeenCalledWith(1);
+      },
+      () => {
+        const m = mock.fn();
+        m(2);
+        expect(m).toHaveBeenCalledWith(1);
+      },
+    );
+  },
 });
 
-Deno.test(function toHaveNthReturnedWith() {
-  assertAllPass(
-    () => {
-      const m = mock.fn((x: number) => x);
-      m(1, 2, 3);
-      expect(m).toHaveNthReturnedWith(1, 1);
-    },
-    () => {
-      const m = mock.fn((x: number) => x);
-      m(1, 2, 3);
-      m(2, 3, 4);
-      expect(m).not.toHaveNthReturnedWith(2, 1);
-      expect(m).toHaveNthReturnedWith(2, 2);
-    },
-  );
+Deno.test({
+  name: "toHaveBeenLastCalledWith",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m(1, 2, 3);
+        expect(m).toHaveBeenLastCalledWith(1, 2, 3);
+      },
+      () => {
+        const m = mock.fn();
+        m(1, 2, 3);
+        m(2, 3, 4);
+        expect(m).not.toHaveBeenLastCalledWith(1, 2, 3);
+        expect(m).toHaveBeenLastCalledWith(2, 3, 4);
+      },
+    );
 
-  assertAllFail(
-    () => {
-      const m = mock.fn();
-      expect(m).toHaveNthReturnedWith(1, 1);
-    },
-    () => {
-      const m = mock.fn();
-      m(2);
-      expect(m).toHaveNthReturnedWith(1, 1);
-    },
-  );
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveBeenLastCalledWith(1);
+      },
+      () => {
+        const m = mock.fn();
+        m(2);
+        expect(m).toHaveBeenLastCalledWith(1);
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenNthCalledWith",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m(1, 2, 3);
+        expect(m).toHaveBeenNthCalledWith(1, 1, 2, 3);
+      },
+      () => {
+        const m = mock.fn();
+        m(1, 2, 3);
+        m(2, 3, 4);
+        expect(m).not.toHaveBeenNthCalledWith(2, 1, 2, 3);
+        expect(m).toHaveBeenNthCalledWith(2, 2, 3, 4);
+      },
+    );
+
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveBeenNthCalledWith(1, 1, 2);
+      },
+      () => {
+        const m = mock.fn();
+        m(2);
+        expect(m).toHaveBeenNthCalledWith(1, 1);
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedWith",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m();
+        expect(m).toHaveReturnedWith(undefined);
+      },
+      () => {
+        const m = mock.fn(() => true);
+        m();
+        expect(m).not.toHaveReturnedWith(false);
+        expect(m).toHaveReturnedWith(true);
+      },
+      () => {
+        const m = mock.fn(() => {
+          throw new Error("TEST");
+        });
+        try {
+          m();
+        } catch (err) {}
+        expect(m).not.toHaveReturnedWith(10);
+      },
+    );
+
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveReturnedWith(1);
+      },
+      () => {
+        const m = mock.fn();
+        m(2);
+        expect(m).toHaveReturnedWith(1);
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedTimes",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m();
+        expect(m).toHaveReturnedTimes(1);
+      },
+      () => {
+        const m = mock.fn(() => true);
+        expect(m).toHaveReturnedTimes(0);
+      },
+      () => {
+        const m = mock.fn(() => {
+          throw new Error("TEST");
+        });
+        try {
+          m();
+        } catch (err) {}
+        expect(m).toHaveReturnedTimes(0);
+      },
+    );
+
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveReturnedTimes(1);
+      },
+      () => {
+        const m = mock.fn();
+        m(2);
+        expect(m).not.toHaveReturnedTimes(1);
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "toHaveReturned",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn();
+        m();
+        expect(m).toHaveReturned();
+      },
+      () => {
+        const m = mock.fn();
+        expect(m).not.toHaveReturned();
+      },
+      () => {
+        const m = mock.fn(() => {
+          throw new Error("TEST");
+        });
+        try {
+          m();
+        } catch (err) {}
+        expect(m).not.toHaveReturned();
+      },
+    );
+
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveReturned();
+      },
+      () => {
+        const m = mock.fn();
+        m();
+        expect(m).not.toHaveReturned();
+      },
+      () => {
+        const m = mock.fn(() => {
+          throw new Error("TEST");
+        });
+        m();
+        expect(m).not.toHaveReturned();
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "toHaveLastReturnedWith",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn((x: number) => x);
+        m(1);
+        m(2);
+        expect(m).toHaveLastReturnedWith(2);
+      },
+      () => {
+        const m = mock.fn((x: number) => x);
+        m(1);
+        m(2);
+        expect(m).toHaveLastReturnedWith(2);
+      },
+    );
+
+    await assertAllFail(
+      () => {
+        const m = mock.fn((x: number) => x);
+        expect(m).toHaveLastReturnedWith(1);
+      },
+      () => {
+        const m = mock.fn((x: number) => x);
+        m(2);
+        expect(m).toHaveLastReturnedWith(1);
+      },
+    );
+  },
+});
+
+Deno.test({
+  name: "toHaveNthReturnedWith",
+  fn: async () => {
+    await assertAllPass(
+      () => {
+        const m = mock.fn((x: number) => x);
+        m(1, 2, 3);
+        expect(m).toHaveNthReturnedWith(1, 1);
+      },
+      () => {
+        const m = mock.fn((x: number) => x);
+        m(1, 2, 3);
+        m(2, 3, 4);
+        expect(m).not.toHaveNthReturnedWith(2, 1);
+        expect(m).toHaveNthReturnedWith(2, 2);
+      },
+    );
+
+    await assertAllFail(
+      () => {
+        const m = mock.fn();
+        expect(m).toHaveNthReturnedWith(1, 1);
+      },
+      () => {
+        const m = mock.fn();
+        m(2);
+        expect(m).toHaveNthReturnedWith(1, 1);
+      },
+    );
+  },
 });

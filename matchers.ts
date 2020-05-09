@@ -1,19 +1,19 @@
 import {
   AssertionError,
   equal,
-} from "https://deno.land/std@v0.41.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.50.0/testing/asserts.ts";
 
 import diff, {
   DiffType,
   DiffResult,
-} from "https://deno.land/std@v0.41.0/testing/diff.ts";
+} from "https://deno.land/std@v0.50.0/testing/diff.ts";
 import {
   red,
   green,
   white,
   gray,
   bold,
-} from "https://deno.land/std@v0.41.0/fmt/colors.ts";
+} from "https://deno.land/std@v0.50.0/fmt/colors.ts";
 
 import * as mock from "./mock.ts";
 
@@ -103,10 +103,12 @@ export function toBe(actual: any, expected: any): MatchResult {
   if (actual === expected) return { pass: true };
 
   return buildFail(
-    `expect(${ACTUAL}).toBe(${EXPECTED})\n\n${buildDiffMessage(
-      actual,
-      expected,
-    )}`,
+    `expect(${ACTUAL}).toBe(${EXPECTED})\n\n${
+      buildDiffMessage(
+        actual,
+        expected,
+      )
+    }`,
   );
 }
 
@@ -114,10 +116,12 @@ export function toEqual(actual: any, expected: any): MatchResult {
   if (equal(actual, expected)) return { pass: true };
 
   return buildFail(
-    `expect(${ACTUAL}).toEqual(${EXPECTED})\n\n${buildDiffMessage(
-      actual,
-      expected,
-    )}`,
+    `expect(${ACTUAL}).toEqual(${EXPECTED})\n\n${
+      buildDiffMessage(
+        actual,
+        expected,
+      )
+    }`,
   );
 }
 
@@ -128,9 +132,11 @@ export function toBeGreaterThan(actual: any, comparison: number): MatchResult {
   const comparisonString = createStr(comparison);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeGreaterThan(${EXPECTED})\n\n  ${red(
-      actualString,
-    )} is not greater than ${green(comparisonString)}`,
+    `expect(${ACTUAL}).toBeGreaterThan(${EXPECTED})\n\n  ${
+      red(
+        actualString,
+      )
+    } is not greater than ${green(comparisonString)}`,
   );
 }
 
@@ -141,9 +147,11 @@ export function toBeLessThan(actual: any, comparison: number): MatchResult {
   const comparisonString = createStr(comparison);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeLessThan(${EXPECTED})\n\n  ${red(
-      actualString,
-    )} is not less than ${green(comparisonString)}`,
+    `expect(${ACTUAL}).toBeLessThan(${EXPECTED})\n\n  ${
+      red(
+        actualString,
+      )
+    } is not less than ${green(comparisonString)}`,
   );
 }
 
@@ -157,9 +165,11 @@ export function toBeGreaterThanOrEqual(
   const comparisonString = createStr(comparison);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeGreaterThanOrEqual(${EXPECTED})\n\n  ${red(
-      actualString,
-    )} is not greater than or equal to ${green(comparisonString)}`,
+    `expect(${ACTUAL}).toBeGreaterThanOrEqual(${EXPECTED})\n\n  ${
+      red(
+        actualString,
+      )
+    } is not greater than or equal to ${green(comparisonString)}`,
   );
 }
 
@@ -173,9 +183,11 @@ export function toBeLessThanOrEqual(
   const comparisonString = createStr(comparison);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeLessThanOrEqual(${EXPECTED})\n\n  ${red(
-      actualString,
-    )} is not less than or equal to ${green(comparisonString)}`,
+    `expect(${ACTUAL}).toBeLessThanOrEqual(${EXPECTED})\n\n  ${
+      red(
+        actualString,
+      )
+    } is not less than or equal to ${green(comparisonString)}`,
   );
 }
 
@@ -205,9 +217,11 @@ export function toBeDefined(value: unknown): MatchResult {
   const actualString = createStr(value);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeDefined()\n\n    ${red(
-      actualString,
-    )} is not defined`,
+    `expect(${ACTUAL}).toBeDefined()\n\n    ${
+      red(
+        actualString,
+      )
+    } is not defined`,
   );
 }
 
@@ -217,9 +231,11 @@ export function toBeUndefined(value: unknown): MatchResult {
   const actualString = createStr(value);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeUndefined()\n\n    ${red(
-      actualString,
-    )} is defined but should be undefined`,
+    `expect(${ACTUAL}).toBeUndefined()\n\n    ${
+      red(
+        actualString,
+      )
+    } is defined but should be undefined`,
   );
 }
 
@@ -250,9 +266,11 @@ export function toBeInstanceOf(value: any, expected: Function): MatchResult {
   const expectedString = createStr(expected);
 
   return buildFail(
-    `expect(${ACTUAL}).toBeInstanceOf(${EXPECTED})\n\n    expected ${green(
-      expected.name,
-    )} but received ${red(actualString)}`,
+    `expect(${ACTUAL}).toBeInstanceOf(${EXPECTED})\n\n    expected ${
+      green(
+        expected.name,
+      )
+    } but received ${red(actualString)}`,
   );
 }
 
@@ -265,9 +283,11 @@ export function toMatch(value: any, pattern: RegExp | string): MatchResult {
     const patternString = createStr(pattern);
 
     return buildFail(
-      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    expected ${red(
-        actualString,
-      )} to contain ${green(patternString)}`,
+      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    expected ${
+        red(
+          actualString,
+        )
+      } to contain ${green(patternString)}`,
     );
   } else if (pattern instanceof RegExp) {
     if (pattern.exec(valueStr)) return { pass: true };
@@ -276,9 +296,11 @@ export function toMatch(value: any, pattern: RegExp | string): MatchResult {
     const patternString = createStr(pattern);
 
     return buildFail(
-      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    ${red(
-        actualString,
-      )} did not match regex ${green(patternString)}`,
+      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    ${
+        red(
+          actualString,
+        )
+      } did not match regex ${green(patternString)}`,
     );
   } else {
     return buildFail("Invalid internal state");
@@ -294,9 +316,11 @@ export function toHaveProperty(value: any, propName: string): MatchResult {
   const propNameString = createStr(propName);
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveProperty(${EXPECTED})\n\n    ${red(
-      actualString,
-    )} did not contain property ${green(propNameString)}`,
+    `expect(${ACTUAL}).toHaveProperty(${EXPECTED})\n\n    ${
+      red(
+        actualString,
+      )
+    } did not contain property ${green(propNameString)}`,
   );
 }
 export function toHaveLength(value: any, length: number): MatchResult {
@@ -306,9 +330,11 @@ export function toHaveLength(value: any, length: number): MatchResult {
   const lengthString = createStr(length);
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveLength(${EXPECTED})\n\n    expected array to have length ${green(
-      lengthString,
-    )} but was ${red(actualString)}`,
+    `expect(${ACTUAL}).toHaveLength(${EXPECTED})\n\n    expected array to have length ${
+      green(
+        lengthString,
+      )
+    } but was ${red(actualString)}`,
   );
 }
 
@@ -320,15 +346,19 @@ export function toContain(value: any, item: any): MatchResult {
 
   if (Array.isArray(value)) {
     return buildFail(
-      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    ${red(
-        actualString,
-      )} did not contain ${green(itemString)}`,
+      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    ${
+        red(
+          actualString,
+        )
+      } did not contain ${green(itemString)}`,
     );
   } else {
     return buildFail(
-      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    expected ${red(
-        actualString,
-      )} to contain ${green(itemString)} but it is ${red("not")} an array`,
+      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    expected ${
+        red(
+          actualString,
+        )
+      } to contain ${green(itemString)} but it is ${red("not")} an array`,
     );
   }
 }
@@ -350,21 +380,29 @@ export function toThrow(value: any, error?: RegExp | string): MatchResult {
     if (typeof error === "string") {
       if (!value.message.includes(error)) {
         return buildFail(
-          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${red(
-            actualString,
-          )} to throw error matching ${green(errorString)} but it threw ${red(
-            value.toString(),
-          )}`,
+          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${
+            red(
+              actualString,
+            )
+          } to throw error matching ${green(errorString)} but it threw ${
+            red(
+              value.toString(),
+            )
+          }`,
         );
       }
     } else if (error instanceof RegExp) {
       if (!value.message.match(error)) {
         return buildFail(
-          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${red(
-            actualString,
-          )} to throw error matching ${green(errorString)} but it threw ${red(
-            value.toString(),
-          )}`,
+          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${
+            red(
+              actualString,
+            )
+          } to throw error matching ${green(errorString)} but it threw ${
+            red(
+              value.toString(),
+            )
+          }`,
         );
       }
     }
@@ -372,9 +410,11 @@ export function toThrow(value: any, error?: RegExp | string): MatchResult {
     return { pass: true };
   } else {
     return buildFail(
-      `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${red(
-        actualString,
-      )} to throw but it did not`,
+      `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${
+        red(
+          actualString,
+        )
+      } to throw but it did not`,
     );
   }
 }
@@ -406,9 +446,11 @@ export function toHaveBeenCalled(value: any): MatchResult {
   if (calls && calls.length !== 0) return { pass: true };
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenCalled()\n\n    ${red(
-      actualString,
-    )} was not called`,
+    `expect(${ACTUAL}).toHaveBeenCalled()\n\n    ${
+      red(
+        actualString,
+      )
+    } was not called`,
   );
 }
 
@@ -434,9 +476,11 @@ export function toHaveBeenCalledWith(value: any, ...args: any[]): MatchResult {
   const argsString = createStr(args);
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenCalledTimes(${EXPECTED})\n\n    function was not called with: ${green(
-      argsString,
-    )}`,
+    `expect(${ACTUAL}).toHaveBeenCalledTimes(${EXPECTED})\n\n    function was not called with: ${
+      green(
+        argsString,
+      )
+    }`,
   );
 }
 
