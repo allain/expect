@@ -2,6 +2,7 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@v0.50.0/testing/asserts.ts";
+import * as mock from "./mock.ts";
 
 import {
   toBe,
@@ -22,6 +23,16 @@ import {
   toContain,
   toThrow,
   MatchResult,
+  toHaveBeenCalled,
+  toHaveBeenCalledTimes,
+  toHaveBeenCalledWith,
+  toHaveBeenLastCalledWith,
+  toHaveBeenNthCalledWith,
+  toHaveReturnedWith,
+  toHaveReturned,
+  toHaveLastReturnedWith,
+  toHaveReturnedTimes,
+  toHaveNthReturnedWith,
 } from "./matchers.ts";
 
 function assertResult(actual: MatchResult, expected: MatchResult) {
@@ -446,13 +457,262 @@ Deno.test({
   },
 });
 
-//TODO(allain) - toHaveBeenCalled(value: any): MatchResult
-//TODO(allain) - toHaveBeenCalledTimes(value: any, times: number): MatchResult
-//TODO(allain) - toHaveBeenCalledWith(value: any, ...args: any[]): MatchResult
-//TODO(allain) - toHaveBeenLastCalledWith(value: any, ...args: any[]): MatchResult
-//TODO(allain) - toHaveBeenNthCalledWith(value: any, nth: number, ...args: any[]): MatchResult
-//TODO(allain) - toHaveReturnedWith(value: any, result: any): MatchResult
-//TODO(allain) - toHaveReturned(value: any): MatchResult
-//TODO(allain) - toHaveLastReturnedWith(value: any, expected: any): MatchResult
-//TODO(allain) - toHaveReturnedTimes(value: any, times: number): MatchResult
-//TODO(allain) - toHaveNthReturnedWith(value: any, nth: number, expected: any): MatchResult
+Deno.test({
+  name: "toHaveBeenCalledPass",
+  fn: () => {
+    const m = mock.fn();
+    m(10);
+    assertResultPass(toHaveBeenCalled(m));
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenCalledFail",
+  fn: () => {
+    const m = mock.fn();
+    assertResult(toHaveBeenCalled(m), {
+      pass: false,
+      message: `expect(actual).toHaveBeenCalled()
+      
+                [Function: f] was not called`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenCalledTimesPass",
+  fn: () => {
+    const m = mock.fn();
+    m(10);
+    m(12);
+    assertResultPass(toHaveBeenCalledTimes(m, 2));
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenCalledTimesFail",
+  fn: () => {
+    const m = mock.fn();
+    m(10);
+    assertResult(toHaveBeenCalledTimes(m, 2), {
+      pass: false,
+      message: `expect(actual).toHaveBeenCalledTimes(expected)
+      
+                expected 2 calls but was called: 1`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenCalledWithPass",
+  fn: () => {
+    const m = mock.fn();
+    m(1, "a");
+    assertResultPass(toHaveBeenCalledWith(m, 1, "a"));
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenCalledWithFail",
+  fn: () => {
+    const m = mock.fn();
+    m(1, "a");
+    assertResult(toHaveBeenCalledWith(m, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenCalledWith(expected)
+      
+                function was not called with: [ 2, "b" ]`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenLastCalledWithPass",
+  fn: () => {
+    const m = mock.fn();
+    m(1, "a");
+    m(2, "b");
+    m(3, "c");
+    assertResultPass(toHaveBeenLastCalledWith(m, 3, "c"));
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenLastCalledWithPass",
+  fn: () => {
+    const m = mock.fn();
+    assertResult(toHaveBeenLastCalledWith(m, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenLastCalledWith(...expected)
+      
+                expect last call args to be 2,b but was not called`,
+    });
+    m(1, "a");
+    m(2, "b");
+    m(3, "c");
+    assertResult(toHaveBeenLastCalledWith(m, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenLastCalledWith(...expected)
+      
+                expect last call args to be 2,b but was: 3,c`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenNthCalledWithPass",
+  fn: () => {
+    const m = mock.fn();
+    m(1, "a");
+    m(2, "b");
+    m(3, "c");
+    const nthCall = 2;
+    assertResultPass(toHaveBeenNthCalledWith(m, nthCall, 2, "b"));
+  },
+});
+
+Deno.test({
+  name: "toHaveBeenNthCalledWithFail",
+  fn: () => {
+    const m = mock.fn();
+    const nthCall = 3;
+    assertResult(toHaveBeenNthCalledWith(m, nthCall, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenNthCalledWith(expected)
+      
+                3th call was not made.`,
+    });
+    m(1, "a");
+    m(2, "b");
+    m(3, "c");
+    assertResult(toHaveBeenNthCalledWith(m, nthCall, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenNthCalledWith(expected)
+      
+                expect 3th call args to be 2,b but was: 3,c`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedWithPass",
+  fn: () => {
+    const m = mock.fn(() => true);
+    m();
+    assertResultPass(toHaveReturnedWith(m, true));
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedWithFail",
+  fn: () => {
+    const m = mock.fn(() => true);
+    m();
+    assertResult(toHaveReturnedWith(m, false), {
+      pass: false,
+      message: `expect(actual).toHaveReturnedWith(expected)
+      
+                function did not return: false`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedPass",
+  fn: () => {
+    const m = mock.fn(() => true);
+    m();
+    assertResultPass(toHaveReturned(m));
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedFail",
+  fn: () => {
+    const m = mock.fn(() => true);
+    assertResult(toHaveReturned(m), {
+      pass: false,
+      message: `expected function to return but it never did`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveLastReturnedWithPass",
+  fn: () => {
+    const m = mock.fn((arg: boolean) => arg);
+    m(false);
+    m(true);
+    assertResultPass(toHaveLastReturnedWith(m, true));
+  },
+});
+
+Deno.test({
+  name: "toHaveLastReturnedWithFail",
+  fn: () => {
+    const m = mock.fn((arg: boolean) => arg);
+    assertResult(toHaveLastReturnedWith(m, true), {
+      pass: false,
+      message: `no calls made to function`,
+    });
+    m(true);
+    m(false);
+    assertResult(toHaveLastReturnedWith(m, true), {
+      pass: false,
+      message: `expected last call to return true but returned: false`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedTimesPass",
+  fn: () => {
+    const m = mock.fn(() => true);
+    m();
+    m();
+    m();
+    assertResultPass(toHaveReturnedTimes(m, 3));
+  },
+});
+
+Deno.test({
+  name: "toHaveReturnedTimesFail",
+  fn: () => {
+    const m = mock.fn(() => true);
+    m();
+    assertResult(toHaveReturnedTimes(m, 3), {
+      pass: false,
+      message: `expected 3 returned times but returned 1 times`,
+    });
+  },
+});
+
+Deno.test({
+  name: "toHaveNthReturnedWithPass",
+  fn: () => {
+    const m = mock.fn((n: number) => n);
+    m(1);
+    m(2);
+    m(3);
+    const nthCall = 2;
+    assertResultPass(toHaveNthReturnedWith(m, nthCall, 2));
+  },
+});
+
+Deno.test({
+  name: "toHaveNthReturnedWithFail",
+  fn: () => {
+    const m = mock.fn((n: number) => n);
+    m(1);
+    m(2);
+    m(3);
+    assertResult(toHaveNthReturnedWith(m, 2, 1), {
+      pass: false,
+      message: `expected 2th call to return 1 but returned: 2`,
+    });
+    assertResult(toHaveNthReturnedWith(m, 9, 1), {
+      pass: false,
+      message: `9 calls were now made`,
+    });
+  },
+});

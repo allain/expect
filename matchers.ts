@@ -476,7 +476,7 @@ export function toHaveBeenCalledWith(value: any, ...args: any[]): MatchResult {
   const argsString = createStr(args);
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenCalledTimes(${EXPECTED})\n\n    function was not called with: ${
+    `expect(${ACTUAL}).toHaveBeenCalledWith(${EXPECTED})\n\n    function was not called with: ${
       green(
         argsString,
       )
