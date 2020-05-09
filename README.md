@@ -1,5 +1,7 @@
 # expect
 
+[![][ghw badge]][ghw link]
+
 A deno implementation of `expect` in order to write tests in a more `jest` like style.
 
 ```typescript
@@ -37,3 +39,6 @@ interface Expected {
   rejects: Expected;
 }
 ```
+
+[ghw badge]: https://img.shields.io/github/workflow/status/allain/expect/ci
+[ghw link]: https://github.com/allain/expect/actions?query=workflow%3Aci
