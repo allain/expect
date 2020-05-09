@@ -30,6 +30,7 @@ import {
   toHaveBeenNthCalledWith,
   toHaveReturnedWith,
   toHaveReturned,
+  toHaveLastReturnedWith,
 } from "./matchers.ts";
 
 function assertResult(actual: MatchResult, expected: MatchResult) {
@@ -538,6 +539,12 @@ Deno.test({
   name: "toHaveBeenLastCalledWithPass",
   fn: () => {
     const m = mock.fn();
+    assertResult(toHaveBeenLastCalledWith(m, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenLastCalledWith(...expected)
+      
+                expect last call args to be 2,b but was not called`,
+    });
     m(1, "a");
     m(2, "b");
     m(3, "c");
@@ -566,10 +573,16 @@ Deno.test({
   name: "toHaveBeenNthCalledWithFail",
   fn: () => {
     const m = mock.fn();
+    const nthCall = 3;
+    assertResult(toHaveBeenNthCalledWith(m, nthCall, 2, "b"), {
+      pass: false,
+      message: `expect(actual).toHaveBeenNthCalledWith(expected)
+      
+                3th call was not made.`,
+    });
     m(1, "a");
     m(2, "b");
     m(3, "c");
-    const nthCall = 3;
     assertResult(toHaveBeenNthCalledWith(m, nthCall, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenNthCalledWith(expected)
@@ -617,14 +630,38 @@ Deno.test({
     const m = mock.fn(() => true);
     assertResult(toHaveReturned(m), {
       pass: false,
-      message: `expect(actual).toHaveReturned()
-
-                expected function to return but it never did`,
+      message: `expected function to return but it never did`,
     });
   },
 });
 
-//TODO(allain) - toHaveReturned(value: any): MatchResult
+Deno.test({
+  name: "toHaveLastReturnedWithPass",
+  fn: () => {
+    const m = mock.fn((arg: boolean) => arg);
+    m(false);
+    m(true);
+    assertResultPass(toHaveLastReturnedWith(m, true));
+  },
+});
+
+Deno.test({
+  name: "toHaveLastReturnedWithFail",
+  fn: () => {
+    const m = mock.fn((arg: boolean) => arg);
+    assertResult(toHaveLastReturnedWith(m, true), {
+      pass: false,
+      message: `no calls made to function`,
+    });
+    m(true);
+    m(false);
+    assertResult(toHaveLastReturnedWith(m, true), {
+      pass: false,
+      message: `expected last call to return true but returned: false`,
+    });
+  },
+});
+
 //TODO(allain) - toHaveLastReturnedWith(value: any, expected: any): MatchResult
 //TODO(allain) - toHaveReturnedTimes(value: any, times: number): MatchResult
 //TODO(allain) - toHaveNthReturnedWith(value: any, nth: number, expected: any): MatchResult

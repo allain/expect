@@ -547,9 +547,7 @@ export function toHaveReturned(value: any): MatchResult {
   if (calls && calls.some((c) => c.returns)) return { pass: true };
 
   // TODO(allain): better messages
-  return buildFail(
-    `expect(${ACTUAL}).toHaveReturned()\n\n    expected function to return but it never did`,
-  );
+  return buildFail(`expected function to return but it never did`);
 }
 
 // TODO(allain): better messages
