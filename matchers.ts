@@ -298,7 +298,7 @@ export function toHaveProperty (value: any, propName: string): MatchResult {
   )
 }
 export function toHaveLength (value: any, length: number): MatchResult {
-  if (value.length === length) return { pass: true }
+  if (value?.length === length) return { pass: true }
 
   const actualString = createStr(value.length)
   const lengthString = createStr(length)
