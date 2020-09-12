@@ -1,7 +1,9 @@
 {
   "name": "expect",
-  "description": "A deno implementation of `expect` in order to write tests in a more `jest` like style.",
+  "description": "helpers for writing jest like expect tests in deno",
   "stable": true,
+  "version": "0.2.1",
+  "repository": "https://github.com/allain/expect",
   "files": [
     "LICENSE",
     "README.md",
