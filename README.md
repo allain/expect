@@ -34,6 +34,18 @@ interface Expected {
   toBeLessThan(number: number, msg?: string): void;
   toBeLessThanOrEqual(number: number, msg?: string): void;
 
+  // mock calls
+  toHaveBeenCalled(): void;
+  toHaveBeenCalledTimes(times: number): void;
+  toHaveBeenCalledWith(...args: any[]): void;
+  toHaveBeenLastCalledWith(...args: any[]): void;
+  toHaveBeenNthCalledWith(nth: number, ...args: any[]): void;
+  toHaveReturnedWith(expected: any): void;
+  toHaveReturned(): void;
+  toHaveLastReturnedWith(expected: any): void;
+  toHaveReturnedTimes(times: number): void;
+  toHaveNthReturnedWith(nth:number, expected: any): void;
+
   not: Expected;
   resolves: Expected;
   rejects: Expected;
