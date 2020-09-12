@@ -1,0 +1,16 @@
+{
+  "name": "expect",
+  "description": "A deno implementation of `expect` in order to write tests in a more `jest` like style.",
+  "stable": true,
+  "files": [
+    "LICENSE",
+    "README.md",
+    "expect.ts",
+    "expect_test.ts",
+    "matchers.ts",
+    "matchers_test.ts",
+    "mock.ts",
+    "mock_test.ts",
+    "mod.ts"
+  ]
+}
