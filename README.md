@@ -1,3 +1,5 @@
+[![nest badge](https://nest.land/badge.svg)](https://nest.land/package/expect)
+
 # expect
 
 [![][ghw badge]][ghw link]
@@ -5,10 +7,10 @@
 A deno implementation of `expect` in order to write tests in a more `jest` like style.
 
 ```typescript
-import { expect } from "./expect.ts";
+import { expect } from "https://deno.land/x/expect/mod.ts";
 
 expect(10).toEqual(10);
-expect(Promise.resolves(20)).resolves.toEqual(20);
+expect(Promise.resolve(20)).resolves.toEqual(20);
 ```
 
 ```typescript
