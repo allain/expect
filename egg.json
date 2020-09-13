@@ -2,7 +2,6 @@
   "name": "expect",
   "description": "helpers for writing jest like expect tests in deno",
   "stable": true,
-  "version": "0.2.1",
   "repository": "https://github.com/allain/expect",
   "files": [
     "LICENSE",
