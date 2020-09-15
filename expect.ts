@@ -1,5 +1,5 @@
 import * as builtInMatchers from "./matchers.ts";
-import { Matcher, Matchers } from "./matchers.ts";
+import type { Matcher, Matchers } from "./matchers.ts";
 
 import { AssertionError } from "https://deno.land/std@v0.50.0/testing/asserts.ts";
 
