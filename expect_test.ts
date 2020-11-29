@@ -1,10 +1,10 @@
 import {
   assertEquals,
-  assertThrows,
   AssertionError,
-} from "https://deno.land/std@v0.50.0/testing/asserts.ts";
+  assertThrows,
+} from "https://deno.land/std@0.50.0/testing/asserts.ts";
 
-import { expect, addMatchers } from "./expect.ts";
+import { addMatchers, expect } from "./expect.ts";
 import * as mock from "./mock.ts";
 
 async function assertPass(fn: Function) {

@@ -1,6 +1,11 @@
 name: ci
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "24 8 * * SAT"
 
 jobs:
   build:
@@ -10,7 +15,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: denolib/setup-deno@master
         with:
-          deno-version: 1.0.0-rc1
+          deno-version: 1.x
       - run: |
           deno fmt --check
           deno test -A

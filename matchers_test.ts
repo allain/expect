@@ -1,38 +1,38 @@
 import {
   assert,
   assertEquals,
-} from "https://deno.land/std@v0.50.0/testing/asserts.ts";
+} from "https://deno.land/std@0.50.0/testing/asserts.ts";
 import * as mock from "./mock.ts";
 
 import {
+  MatchResult,
   toBe,
+  toBeDefined,
+  toBeFalsy,
   toBeGreaterThan,
+  toBeInstanceOf,
   toBeLessThan,
   toBeLessThanOrEqual,
-  toEqual,
-  toBeTruthy,
-  toBeFalsy,
-  toBeDefined,
-  toBeUndefined,
-  toBeNull,
   toBeNaN,
-  toBeInstanceOf,
-  toMatch,
-  toHaveLength,
-  toHaveProperty,
+  toBeNull,
+  toBeTruthy,
+  toBeUndefined,
   toContain,
-  toThrow,
-  MatchResult,
+  toEqual,
   toHaveBeenCalled,
   toHaveBeenCalledTimes,
   toHaveBeenCalledWith,
   toHaveBeenLastCalledWith,
   toHaveBeenNthCalledWith,
-  toHaveReturnedWith,
-  toHaveReturned,
   toHaveLastReturnedWith,
-  toHaveReturnedTimes,
+  toHaveLength,
   toHaveNthReturnedWith,
+  toHaveProperty,
+  toHaveReturned,
+  toHaveReturnedTimes,
+  toHaveReturnedWith,
+  toMatch,
+  toThrow,
 } from "./matchers.ts";
 
 function assertResult(actual: MatchResult, expected: MatchResult) {
@@ -79,7 +79,7 @@ Deno.test({
     assertResult(toBe({}, {}), {
       pass: false,
       message: `expect(actual).toBe(expected)
-      
+
                 {}`,
     });
   },
@@ -124,7 +124,7 @@ Deno.test({
     assertResult(toBeGreaterThan(1, 2), {
       pass: false,
       message: `expect(actual).toBeGreaterThan(expected)
-  
+
                 1 is not greater than 2`,
     });
   },
@@ -143,7 +143,7 @@ Deno.test({
     assertResult(toBeLessThan(2, 1), {
       pass: false,
       message: `expect(actual).toBeLessThan(expected)
-  
+
                 2 is not less than 1`,
     });
   },
@@ -162,7 +162,7 @@ Deno.test({
     assertResult(toBeLessThanOrEqual(2, 1), {
       pass: false,
       message: `expect(actual).toBeLessThanOrEqual(expected)
-  
+
                 2 is not less than or equal to 1`,
     });
   },
@@ -183,7 +183,7 @@ Deno.test({
     assertResult(toBeTruthy(false), {
       pass: false,
       message: `expect(actual).toBeTruthy()
-  
+
                 false is not truthy`,
     });
   },
@@ -204,7 +204,7 @@ Deno.test({
     assertResult(toBeFalsy(true), {
       pass: false,
       message: `expect(actual).toBeFalsy()
-  
+
                 true is not falsy`,
     });
   },
@@ -224,7 +224,7 @@ Deno.test({
     assertResult(toBeDefined(undefined), {
       pass: false,
       message: `expect(actual).toBeDefined()
-  
+
                 undefined is not defined`,
     });
   },
@@ -243,7 +243,7 @@ Deno.test({
     assertResult(toBeUndefined(null), {
       pass: false,
       message: `expect(actual).toBeUndefined()
-  
+
                 null is defined but should be undefined`,
     });
   },
@@ -262,7 +262,7 @@ Deno.test({
     assertResult(toBeNull(10), {
       pass: false,
       message: `expect(actual).toBeNull()
-  
+
                 10 should be null`,
     });
   },
@@ -281,7 +281,7 @@ Deno.test({
     assertResult(toBeNaN(10), {
       pass: false,
       message: `expect(actual).toBeNaN()
-  
+
                 10 should be NaN`,
     });
   },
@@ -327,15 +327,15 @@ Deno.test({
     assertResult(toMatch("yo", "hell"), {
       pass: false,
       message: `expect(actual).toMatch(expected)
-  
-                expected yo to contain hell`,
+
+                expected "yo" to contain "hell"`,
     });
 
     assertResult(toMatch("yo", /^hell/), {
       pass: false,
       message: `expect(actual).toMatch(expected)
 
-                yo did not match regex /^hell/`,
+                "yo" did not match regex /^hell/`,
     });
   },
 });
@@ -353,8 +353,8 @@ Deno.test({
     assertResult(toHaveProperty({ a: 1 }, "b"), {
       pass: false,
       message: `expect(actual).toHaveProperty(expected)
-      
-                { a: 1 } did not contain property b`,
+
+                { a: 1 } did not contain property "b"`,
     });
   },
 });
@@ -374,7 +374,7 @@ Deno.test({
     assertResult(toHaveLength([], 1), {
       pass: false,
       message: `expect(actual).toHaveLength(expected)
-        
+
                 expected array to have length 1 but was 0`,
     });
   },
@@ -393,13 +393,13 @@ Deno.test({
     assertResult(toContain([2, 3], 1), {
       pass: false,
       message: `expect(actual).toContain(expected)
-      
+
                 [ 2, 3 ] did not contain 1`,
     });
     assertResult(toContain(false, 1), {
       pass: false,
       message: `expect(actual).toContain(expected)
-      
+
                 expected false to contain 1 but it is not an array`,
     });
   },
@@ -427,7 +427,7 @@ Deno.test({
     assertResult(toThrow(() => {}, "TEST"), {
       pass: false,
       message: `expect(actual).toThrow(expected)
-      
+
                 expected [Function] to throw but it did not`,
     });
 
@@ -438,8 +438,8 @@ Deno.test({
       {
         pass: false,
         message: `expect(actual).toThrow(expected)
-      
-                  expected [Function] to throw error matching TEST but it threw Error: BLAH`,
+
+                  expected [Function] to throw error matching "TEST" but it threw Error: BLAH`,
       },
     );
 
@@ -450,7 +450,7 @@ Deno.test({
       {
         pass: false,
         message: `expect(actual).toThrow(expected)
-      
+
                   expected [Function] to throw error matching /^TEST/ but it threw Error: BLAH`,
       },
     );
@@ -473,7 +473,7 @@ Deno.test({
     assertResult(toHaveBeenCalled(m), {
       pass: false,
       message: `expect(actual).toHaveBeenCalled()
-      
+
                 [Function: f] was not called`,
     });
   },
@@ -497,7 +497,7 @@ Deno.test({
     assertResult(toHaveBeenCalledTimes(m, 2), {
       pass: false,
       message: `expect(actual).toHaveBeenCalledTimes(expected)
-      
+
                 expected 2 calls but was called: 1`,
     });
   },
@@ -520,7 +520,7 @@ Deno.test({
     assertResult(toHaveBeenCalledWith(m, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenCalledWith(expected)
-      
+
                 function was not called with: [ 2, "b" ]`,
     });
   },
@@ -544,7 +544,7 @@ Deno.test({
     assertResult(toHaveBeenLastCalledWith(m, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenLastCalledWith(...expected)
-      
+
                 expect last call args to be 2,b but was not called`,
     });
     m(1, "a");
@@ -553,7 +553,7 @@ Deno.test({
     assertResult(toHaveBeenLastCalledWith(m, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenLastCalledWith(...expected)
-      
+
                 expect last call args to be 2,b but was: 3,c`,
     });
   },
@@ -579,7 +579,7 @@ Deno.test({
     assertResult(toHaveBeenNthCalledWith(m, nthCall, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenNthCalledWith(expected)
-      
+
                 3th call was not made.`,
     });
     m(1, "a");
@@ -588,7 +588,7 @@ Deno.test({
     assertResult(toHaveBeenNthCalledWith(m, nthCall, 2, "b"), {
       pass: false,
       message: `expect(actual).toHaveBeenNthCalledWith(expected)
-      
+
                 expect 3th call args to be 2,b but was: 3,c`,
     });
   },
@@ -611,7 +611,7 @@ Deno.test({
     assertResult(toHaveReturnedWith(m, false), {
       pass: false,
       message: `expect(actual).toHaveReturnedWith(expected)
-      
+
                 function did not return: false`,
     });
   },
