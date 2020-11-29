@@ -1,19 +1,19 @@
 import {
   AssertionError,
   equal,
-} from "https://deno.land/std@v0.50.0/testing/asserts.ts";
+} from "https://deno.land/std@0.50.0/testing/asserts.ts";
 
 import diff, {
-  DiffType,
   DiffResult,
-} from "https://deno.land/std@v0.50.0/testing/diff.ts";
+  DiffType,
+} from "https://deno.land/std@0.50.0/testing/diff.ts";
 import {
-  red,
-  green,
-  white,
-  gray,
   bold,
-} from "https://deno.land/std@v0.50.0/fmt/colors.ts";
+  gray,
+  green,
+  red,
+  white,
+} from "https://deno.land/std@0.50.0/fmt/colors.ts";
 
 import * as mock from "./mock.ts";
 
@@ -197,7 +197,7 @@ export function toBeTruthy(value: any): MatchResult {
   const actualString = createStr(value);
 
   return buildFail(`expect(${ACTUAL}).toBeTruthy()
-  
+
       ${red(actualString)} is not truthy`);
 }
 
