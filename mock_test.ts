@@ -1,7 +1,7 @@
 import {
   assert,
   assertEquals,
-} from "https://deno.land/std@0.50.0/testing/asserts.ts";
+} from "https://deno.land/std@0.97.0/testing/asserts.ts";
 
 import * as mock from "./mock.ts";
 
