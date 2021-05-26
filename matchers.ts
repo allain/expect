@@ -1,506 +1,464 @@
 import {
   AssertionError,
-  equal,
-} from "https://deno.land/std@0.97.0/testing/asserts.ts";
+  equal
+} from 'https://deno.land/std@0.97.0/testing/asserts.ts'
 
-import diff, {
+import {
+  diff,
   DiffResult,
-  DiffType,
-} from "https://deno.land/std@0.97.0/testing/diff.ts";
+  DiffType
+} from 'https://deno.land/std@0.97.0/testing/_diff.ts'
+
 import {
   bold,
   gray,
   green,
   red,
-  white,
-} from "https://deno.land/std@0.97.0/fmt/colors.ts";
+  white
+} from 'https://deno.land/std@0.97.0/fmt/colors.ts'
 
-import * as mock from "./mock.ts";
+import * as mock from './mock.ts'
 
 type MatcherState = {
-  isNot: boolean;
-};
+  isNot: boolean
+}
 
-export type Matcher = (value: any, ...args: any[]) => MatchResult;
+export type Matcher = (value: any, ...args: any[]) => MatchResult
 
 export type Matchers = {
-  [key: string]: Matcher;
-};
+  [key: string]: Matcher
+}
 export type MatchResult = {
-  pass: boolean;
-  message?: string;
-};
+  pass: boolean
+  message?: string
+}
 
-const ACTUAL = red(bold("actual"));
-const EXPECTED = green(bold("expected"));
+const ACTUAL = red(bold('actual'))
+const EXPECTED = green(bold('expected'))
 
-const CAN_NOT_DISPLAY = "[Cannot display]";
+const CAN_NOT_DISPLAY = '[Cannot display]'
 
 function createStr(v: unknown): string {
   try {
-    return Deno.inspect(v);
+    return Deno.inspect(v)
   } catch (e) {
-    return red(CAN_NOT_DISPLAY);
+    return red(CAN_NOT_DISPLAY)
   }
 }
 
 function createColor(diffType: DiffType): (s: string) => string {
   switch (diffType) {
     case DiffType.added:
-      return (s: string) => green(bold(s));
+      return (s: string) => green(bold(s))
     case DiffType.removed:
-      return (s: string) => red(bold(s));
+      return (s: string) => red(bold(s))
     default:
-      return white;
+      return white
   }
 }
 
 function createSign(diffType: DiffType): string {
   switch (diffType) {
     case DiffType.added:
-      return "+   ";
+      return '+   '
     case DiffType.removed:
-      return "-   ";
+      return '-   '
     default:
-      return "    ";
+      return '    '
   }
 }
 
 function buildMessage(diffResult: ReadonlyArray<DiffResult<string>>): string {
   return diffResult
     .map((result: DiffResult<string>) => {
-      const c = createColor(result.type);
-      return c(`${createSign(result.type)}${result.value}`);
+      const c = createColor(result.type)
+      return c(`${createSign(result.type)}${result.value}`)
     })
-    .join("\n");
+    .join('\n')
 }
 
 function buildDiffMessage(actual: unknown, expected: unknown) {
-  const actualString = createStr(actual);
-  const expectedString = createStr(expected);
+  const actualString = createStr(actual)
+  const expectedString = createStr(expected)
 
-  let message;
+  let message
   try {
     const diffResult = diff(
-      actualString.split("\n"),
-      expectedString.split("\n"),
-    );
+      actualString.split('\n'),
+      expectedString.split('\n')
+    )
 
-    return buildMessage(diffResult);
+    return buildMessage(diffResult)
   } catch (e) {
-    return `\n${red(CAN_NOT_DISPLAY)} + \n\n`;
+    return `\n${red(CAN_NOT_DISPLAY)} + \n\n`
   }
 }
 
 function buildFail(message: string) {
   return {
     pass: false,
-    message,
-  };
+    message
+  }
 }
 
 export function toBe(actual: any, expected: any): MatchResult {
-  if (actual === expected) return { pass: true };
+  if (actual === expected) return { pass: true }
 
   return buildFail(
-    `expect(${ACTUAL}).toBe(${EXPECTED})\n\n${
-      buildDiffMessage(
-        actual,
-        expected,
-      )
-    }`,
-  );
+    `expect(${ACTUAL}).toBe(${EXPECTED})\n\n${buildDiffMessage(
+      actual,
+      expected
+    )}`
+  )
 }
 
 export function toEqual(actual: any, expected: any): MatchResult {
-  if (equal(actual, expected)) return { pass: true };
+  if (equal(actual, expected)) return { pass: true }
 
   return buildFail(
-    `expect(${ACTUAL}).toEqual(${EXPECTED})\n\n${
-      buildDiffMessage(
-        actual,
-        expected,
-      )
-    }`,
-  );
+    `expect(${ACTUAL}).toEqual(${EXPECTED})\n\n${buildDiffMessage(
+      actual,
+      expected
+    )}`
+  )
 }
 
 export function toBeGreaterThan(actual: any, comparison: number): MatchResult {
-  if (actual > comparison) return { pass: true };
+  if (actual > comparison) return { pass: true }
 
-  const actualString = createStr(actual);
-  const comparisonString = createStr(comparison);
+  const actualString = createStr(actual)
+  const comparisonString = createStr(comparison)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeGreaterThan(${EXPECTED})\n\n  ${
-      red(
-        actualString,
-      )
-    } is not greater than ${green(comparisonString)}`,
-  );
+    `expect(${ACTUAL}).toBeGreaterThan(${EXPECTED})\n\n  ${red(
+      actualString
+    )} is not greater than ${green(comparisonString)}`
+  )
 }
 
 export function toBeLessThan(actual: any, comparison: number): MatchResult {
-  if (actual < comparison) return { pass: true };
+  if (actual < comparison) return { pass: true }
 
-  const actualString = createStr(actual);
-  const comparisonString = createStr(comparison);
+  const actualString = createStr(actual)
+  const comparisonString = createStr(comparison)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeLessThan(${EXPECTED})\n\n  ${
-      red(
-        actualString,
-      )
-    } is not less than ${green(comparisonString)}`,
-  );
+    `expect(${ACTUAL}).toBeLessThan(${EXPECTED})\n\n  ${red(
+      actualString
+    )} is not less than ${green(comparisonString)}`
+  )
 }
 
 export function toBeGreaterThanOrEqual(
   actual: any,
-  comparison: number,
+  comparison: number
 ): MatchResult {
-  if (actual >= comparison) return { pass: true };
+  if (actual >= comparison) return { pass: true }
 
-  const actualString = createStr(actual);
-  const comparisonString = createStr(comparison);
+  const actualString = createStr(actual)
+  const comparisonString = createStr(comparison)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeGreaterThanOrEqual(${EXPECTED})\n\n  ${
-      red(
-        actualString,
-      )
-    } is not greater than or equal to ${green(comparisonString)}`,
-  );
+    `expect(${ACTUAL}).toBeGreaterThanOrEqual(${EXPECTED})\n\n  ${red(
+      actualString
+    )} is not greater than or equal to ${green(comparisonString)}`
+  )
 }
 
 export function toBeLessThanOrEqual(
   actual: any,
-  comparison: number,
+  comparison: number
 ): MatchResult {
-  if (actual <= comparison) return { pass: true };
+  if (actual <= comparison) return { pass: true }
 
-  const actualString = createStr(actual);
-  const comparisonString = createStr(comparison);
+  const actualString = createStr(actual)
+  const comparisonString = createStr(comparison)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeLessThanOrEqual(${EXPECTED})\n\n  ${
-      red(
-        actualString,
-      )
-    } is not less than or equal to ${green(comparisonString)}`,
-  );
+    `expect(${ACTUAL}).toBeLessThanOrEqual(${EXPECTED})\n\n  ${red(
+      actualString
+    )} is not less than or equal to ${green(comparisonString)}`
+  )
 }
 
 export function toBeTruthy(value: any): MatchResult {
-  if (value) return { pass: true };
+  if (value) return { pass: true }
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
   return buildFail(`expect(${ACTUAL}).toBeTruthy()
 
-      ${red(actualString)} is not truthy`);
+      ${red(actualString)} is not truthy`)
 }
 
 export function toBeFalsy(value: any): MatchResult {
-  if (!value) return { pass: true };
+  if (!value) return { pass: true }
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeFalsy()\n\n    ${red(actualString)} is not falsy`,
-  );
+    `expect(${ACTUAL}).toBeFalsy()\n\n    ${red(actualString)} is not falsy`
+  )
 }
 
 export function toBeDefined(value: unknown): MatchResult {
-  if (typeof value !== "undefined") return { pass: true };
+  if (typeof value !== 'undefined') return { pass: true }
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeDefined()\n\n    ${
-      red(actualString)
-    } is not defined`,
-  );
+    `expect(${ACTUAL}).toBeDefined()\n\n    ${red(actualString)} is not defined`
+  )
 }
 
 export function toBeUndefined(value: unknown): MatchResult {
-  if (typeof value === "undefined") return { pass: true };
+  if (typeof value === 'undefined') return { pass: true }
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeUndefined()\n\n    ${
-      red(
-        actualString,
-      )
-    } is defined but should be undefined`,
-  );
+    `expect(${ACTUAL}).toBeUndefined()\n\n    ${red(
+      actualString
+    )} is defined but should be undefined`
+  )
 }
 
 export function toBeNull(value: unknown): MatchResult {
-  if (value === null) return { pass: true };
+  if (value === null) return { pass: true }
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeNull()\n\n    ${red(actualString)} should be null`,
-  );
+    `expect(${ACTUAL}).toBeNull()\n\n    ${red(actualString)} should be null`
+  )
 }
 
 export function toBeNaN(value: unknown): MatchResult {
-  if (typeof value === "number" && isNaN(value)) return { pass: true };
+  if (typeof value === 'number' && isNaN(value)) return { pass: true }
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeNaN()\n\n    ${red(actualString)} should be NaN`,
-  );
+    `expect(${ACTUAL}).toBeNaN()\n\n    ${red(actualString)} should be NaN`
+  )
 }
 
 export function toBeInstanceOf(value: any, expected: Function): MatchResult {
-  if (value instanceof expected) return { pass: true };
+  if (value instanceof expected) return { pass: true }
 
-  const actualString = createStr(value);
-  const expectedString = createStr(expected);
+  const actualString = createStr(value)
+  const expectedString = createStr(expected)
 
   return buildFail(
-    `expect(${ACTUAL}).toBeInstanceOf(${EXPECTED})\n\n    expected ${
-      green(
-        expected.name,
-      )
-    } but received ${red(actualString)}`,
-  );
+    `expect(${ACTUAL}).toBeInstanceOf(${EXPECTED})\n\n    expected ${green(
+      expected.name
+    )} but received ${red(actualString)}`
+  )
 }
 
 export function toMatch(value: any, pattern: RegExp | string): MatchResult {
-  const valueStr = value.toString();
-  if (typeof pattern === "string") {
-    if (valueStr.indexOf(pattern) !== -1) return { pass: true };
+  const valueStr = value.toString()
+  if (typeof pattern === 'string') {
+    if (valueStr.indexOf(pattern) !== -1) return { pass: true }
 
-    const actualString = createStr(value);
-    const patternString = createStr(pattern);
+    const actualString = createStr(value)
+    const patternString = createStr(pattern)
 
     return buildFail(
-      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    expected ${
-        red(
-          actualString,
-        )
-      } to contain ${green(patternString)}`,
-    );
+      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    expected ${red(
+        actualString
+      )} to contain ${green(patternString)}`
+    )
   } else if (pattern instanceof RegExp) {
-    if (pattern.exec(valueStr)) return { pass: true };
+    if (pattern.exec(valueStr)) return { pass: true }
 
-    const actualString = createStr(value);
-    const patternString = createStr(pattern);
+    const actualString = createStr(value)
+    const patternString = createStr(pattern)
 
     return buildFail(
-      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    ${
-        red(
-          actualString,
-        )
-      } did not match regex ${green(patternString)}`,
-    );
+      `expect(${ACTUAL}).toMatch(${EXPECTED})\n\n    ${red(
+        actualString
+      )} did not match regex ${green(patternString)}`
+    )
   } else {
-    return buildFail("Invalid internal state");
+    return buildFail('Invalid internal state')
   }
 }
 
 export function toHaveProperty(value: any, propName: string): MatchResult {
-  if (typeof value === "object" && typeof value[propName] !== "undefined") {
-    return { pass: true };
+  if (typeof value === 'object' && typeof value[propName] !== 'undefined') {
+    return { pass: true }
   }
 
-  const actualString = createStr(value);
-  const propNameString = createStr(propName);
+  const actualString = createStr(value)
+  const propNameString = createStr(propName)
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveProperty(${EXPECTED})\n\n    ${
-      red(
-        actualString,
-      )
-    } did not contain property ${green(propNameString)}`,
-  );
+    `expect(${ACTUAL}).toHaveProperty(${EXPECTED})\n\n    ${red(
+      actualString
+    )} did not contain property ${green(propNameString)}`
+  )
 }
 export function toHaveLength(value: any, length: number): MatchResult {
-  if (value?.length === length) return { pass: true };
+  if (value?.length === length) return { pass: true }
 
-  const actualString = createStr(value.length);
-  const lengthString = createStr(length);
+  const actualString = createStr(value.length)
+  const lengthString = createStr(length)
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveLength(${EXPECTED})\n\n    expected array to have length ${
-      green(
-        lengthString,
-      )
-    } but was ${red(actualString)}`,
-  );
+    `expect(${ACTUAL}).toHaveLength(${EXPECTED})\n\n    expected array to have length ${green(
+      lengthString
+    )} but was ${red(actualString)}`
+  )
 }
 
 export function toContain(value: any, item: any): MatchResult {
-  if (Array.isArray(value) && value.includes(item)) return { pass: true };
+  if (Array.isArray(value) && value.includes(item)) return { pass: true }
 
-  const actualString = createStr(value);
-  const itemString = createStr(item);
+  const actualString = createStr(value)
+  const itemString = createStr(item)
 
   if (Array.isArray(value)) {
     return buildFail(
-      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    ${
-        red(
-          actualString,
-        )
-      } did not contain ${green(itemString)}`,
-    );
+      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    ${red(
+        actualString
+      )} did not contain ${green(itemString)}`
+    )
   } else {
     return buildFail(
-      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    expected ${
-        red(
-          actualString,
-        )
-      } to contain ${green(itemString)} but it is ${red("not")} an array`,
-    );
+      `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    expected ${red(
+        actualString
+      )} to contain ${green(itemString)} but it is ${red('not')} an array`
+    )
   }
 }
 export function toThrow(value: any, error?: RegExp | string): MatchResult {
-  let fn;
-  if (typeof value === "function") {
-    fn = value;
+  let fn
+  if (typeof value === 'function') {
+    fn = value
     try {
-      value = value();
+      value = value()
     } catch (err) {
-      value = err;
+      value = err
     }
   }
 
-  const actualString = createStr(fn);
-  const errorString = createStr(error);
+  const actualString = createStr(fn)
+  const errorString = createStr(error)
 
   if (value instanceof Error) {
-    if (typeof error === "string") {
+    if (typeof error === 'string') {
       if (!value.message.includes(error)) {
         return buildFail(
-          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${
-            red(
-              actualString,
-            )
-          } to throw error matching ${green(errorString)} but it threw ${
-            red(
-              value.toString(),
-            )
-          }`,
-        );
+          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${red(
+            actualString
+          )} to throw error matching ${green(errorString)} but it threw ${red(
+            value.toString()
+          )}`
+        )
       }
     } else if (error instanceof RegExp) {
       if (!value.message.match(error)) {
         return buildFail(
-          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${
-            red(
-              actualString,
-            )
-          } to throw error matching ${green(errorString)} but it threw ${
-            red(
-              value.toString(),
-            )
-          }`,
-        );
+          `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${red(
+            actualString
+          )} to throw error matching ${green(errorString)} but it threw ${red(
+            value.toString()
+          )}`
+        )
       }
     }
 
-    return { pass: true };
+    return { pass: true }
   } else {
     return buildFail(
-      `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${
-        red(
-          actualString,
-        )
-      } to throw but it did not`,
-    );
+      `expect(${ACTUAL}).toThrow(${EXPECTED})\n\nexpected ${red(
+        actualString
+      )} to throw but it did not`
+    )
   }
 }
 
 function extractMockCalls(
   value: any,
-  name: string,
+  name: string
 ): { error?: string; calls: mock.MockCall[] | null } {
-  if (typeof value !== "function") {
+  if (typeof value !== 'function') {
     return {
       calls: null,
-      error: `${name} only works on mock functions. received: ${value}`,
-    };
+      error: `${name} only works on mock functions. received: ${value}`
+    }
   }
-  const calls = mock.calls(value);
+  const calls = mock.calls(value)
   if (calls === null) {
-    return { calls: null, error: `${name} only works on mock functions` };
+    return { calls: null, error: `${name} only works on mock functions` }
   }
 
-  return { calls };
+  return { calls }
 }
 
 export function toHaveBeenCalled(value: any): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveBeenCalled");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveBeenCalled')
+  if (error) return buildFail(error)
 
-  const actualString = createStr(value);
+  const actualString = createStr(value)
 
-  if (calls && calls.length !== 0) return { pass: true };
+  if (calls && calls.length !== 0) return { pass: true }
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenCalled()\n\n    ${
-      red(
-        actualString,
-      )
-    } was not called`,
-  );
+    `expect(${ACTUAL}).toHaveBeenCalled()\n\n    ${red(
+      actualString
+    )} was not called`
+  )
 }
 
 export function toHaveBeenCalledTimes(value: any, times: number): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveBeenCalledTimes");
-  if (error) return buildFail(error);
-  if (!calls) return buildFail("Invalid internal state");
+  const { calls, error } = extractMockCalls(value, 'toHaveBeenCalledTimes')
+  if (error) return buildFail(error)
+  if (!calls) return buildFail('Invalid internal state')
 
-  if (calls && calls.length === times) return { pass: true };
+  if (calls && calls.length === times) return { pass: true }
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenCalledTimes(${EXPECTED})\n\n    expected ${times} calls but was called: ${calls.length}`,
-  );
+    `expect(${ACTUAL}).toHaveBeenCalledTimes(${EXPECTED})\n\n    expected ${times} calls but was called: ${calls.length}`
+  )
 }
 
 export function toHaveBeenCalledWith(value: any, ...args: any[]): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveBeenCalledWith");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveBeenCalledWith')
+  if (error) return buildFail(error)
 
-  const wasCalledWith = calls && calls.some((c) => equal(c.args, args));
-  if (wasCalledWith) return { pass: true };
+  const wasCalledWith = calls && calls.some((c) => equal(c.args, args))
+  if (wasCalledWith) return { pass: true }
 
-  const argsString = createStr(args);
+  const argsString = createStr(args)
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenCalledWith(${EXPECTED})\n\n    function was not called with: ${
-      green(
-        argsString,
-      )
-    }`,
-  );
+    `expect(${ACTUAL}).toHaveBeenCalledWith(${EXPECTED})\n\n    function was not called with: ${green(
+      argsString
+    )}`
+  )
 }
 
 export function toHaveBeenLastCalledWith(
   value: any,
   ...args: any[]
 ): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveBeenLastCalledWith");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveBeenLastCalledWith')
+  if (error) return buildFail(error)
 
   if (!calls || !calls.length) {
     return buildFail(
-      `expect(${ACTUAL}).toHaveBeenLastCalledWith(...${EXPECTED})\n\n    expect last call args to be ${args} but was not called`,
-    );
+      `expect(${ACTUAL}).toHaveBeenLastCalledWith(...${EXPECTED})\n\n    expect last call args to be ${args} but was not called`
+    )
   }
 
-  const lastCall = calls[calls.length - 1];
-  if (equal(lastCall.args, args)) return { pass: true };
+  const lastCall = calls[calls.length - 1]
+  if (equal(lastCall.args, args)) return { pass: true }
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveBeenLastCalledWith(...${EXPECTED})\n\n    expect last call args to be ${args} but was: ${lastCall.args}`,
-  );
+    `expect(${ACTUAL}).toHaveBeenLastCalledWith(...${EXPECTED})\n\n    expect last call args to be ${args} but was: ${lastCall.args}`
+  )
 }
 
 export function toHaveBeenNthCalledWith(
@@ -508,104 +466,101 @@ export function toHaveBeenNthCalledWith(
   nth: number,
   ...args: any[]
 ): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveBeenNthCalledWith");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveBeenNthCalledWith')
+  if (error) return buildFail(error)
 
-  const nthCall = calls && calls[nth - 1];
+  const nthCall = calls && calls[nth - 1]
   if (nthCall) {
-    if (equal(nthCall.args, args)) return { pass: true };
+    if (equal(nthCall.args, args)) return { pass: true }
     return buildFail(
-      `expect(${ACTUAL}).toHaveBeenNthCalledWith(${EXPECTED})\n\n    expect ${nth}th call args to be ${args} but was: ${nthCall.args}`,
-    );
+      `expect(${ACTUAL}).toHaveBeenNthCalledWith(${EXPECTED})\n\n    expect ${nth}th call args to be ${args} but was: ${nthCall.args}`
+    )
   } else {
     return buildFail(
-      `expect(${ACTUAL}).toHaveBeenNthCalledWith(${EXPECTED})\n\n    ${nth}th call was not made.`,
-    );
+      `expect(${ACTUAL}).toHaveBeenNthCalledWith(${EXPECTED})\n\n    ${nth}th call was not made.`
+    )
   }
 }
 
 export function toHaveReturnedWith(value: any, result: any): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveReturnedWith");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveReturnedWith')
+  if (error) return buildFail(error)
 
-  const wasReturnedWith = calls &&
-    calls.some((c) => c.returns && equal(c.returned, result));
-  if (wasReturnedWith) return { pass: true };
+  const wasReturnedWith =
+    calls && calls.some((c) => c.returns && equal(c.returned, result))
+  if (wasReturnedWith) return { pass: true }
 
   return buildFail(
-    `expect(${ACTUAL}).toHaveReturnedWith(${EXPECTED})\n\n    function did not return: ${result}`,
-  );
+    `expect(${ACTUAL}).toHaveReturnedWith(${EXPECTED})\n\n    function did not return: ${result}`
+  )
 }
 
 export function toHaveReturned(value: any): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveReturned");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveReturned')
+  if (error) return buildFail(error)
 
-  if (calls && calls.some((c) => c.returns)) return { pass: true };
+  if (calls && calls.some((c) => c.returns)) return { pass: true }
 
   // TODO(allain): better messages
-  return buildFail(`expected function to return but it never did`);
+  return buildFail(`expected function to return but it never did`)
 }
 
 // TODO(allain): better messages
-export function toHaveLastReturnedWith(
-  value: any,
-  expected: any,
-): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveLastReturnedWith");
-  if (error) return buildFail(error);
+export function toHaveLastReturnedWith(value: any, expected: any): MatchResult {
+  const { calls, error } = extractMockCalls(value, 'toHaveLastReturnedWith')
+  if (error) return buildFail(error)
 
-  const lastCall = calls && calls[calls.length - 1];
+  const lastCall = calls && calls[calls.length - 1]
   if (!lastCall) {
-    return buildFail("no calls made to function");
+    return buildFail('no calls made to function')
   }
   if (lastCall.throws) {
-    return buildFail(`last call to function threw: ${lastCall.thrown}`);
+    return buildFail(`last call to function threw: ${lastCall.thrown}`)
   }
 
-  if (equal(lastCall.returned, expected)) return { pass: true };
+  if (equal(lastCall.returned, expected)) return { pass: true }
 
   return buildFail(
-    `expected last call to return ${expected} but returned: ${lastCall.returned}`,
-  );
+    `expected last call to return ${expected} but returned: ${lastCall.returned}`
+  )
 }
 
 export function toHaveReturnedTimes(value: any, times: number): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveReturnedTimes");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveReturnedTimes')
+  if (error) return buildFail(error)
 
-  const returnCount = calls && calls.filter((c) => c.returns).length;
+  const returnCount = calls && calls.filter((c) => c.returns).length
   if (returnCount !== times) {
     return buildFail(
-      `expected ${times} returned times but returned ${returnCount} times`,
-    );
+      `expected ${times} returned times but returned ${returnCount} times`
+    )
   }
 
-  return { pass: true };
+  return { pass: true }
 }
 
 export function toHaveNthReturnedWith(
   value: any,
   nth: number,
-  expected: any,
+  expected: any
 ): MatchResult {
-  const { calls, error } = extractMockCalls(value, "toHaveNthReturnedWith");
-  if (error) return buildFail(error);
+  const { calls, error } = extractMockCalls(value, 'toHaveNthReturnedWith')
+  if (error) return buildFail(error)
 
-  const nthCall = calls && calls[nth - 1];
+  const nthCall = calls && calls[nth - 1]
   if (!nthCall) {
-    return buildFail(`${nth} calls were now made`);
+    return buildFail(`${nth} calls were now made`)
   }
 
   if (nthCall.throws) {
-    return buildFail(`${nth}th call to function threw: ${nthCall.thrown}`);
+    return buildFail(`${nth}th call to function threw: ${nthCall.thrown}`)
   }
 
   if (!equal(nthCall.returned, expected)) {
     return buildFail(
-      `expected ${nth}th call to return ${expected} but returned: ${nthCall.returned}`,
-    );
+      `expected ${nth}th call to return ${expected} but returned: ${nthCall.returned}`
+    )
   }
 
-  return { pass: true };
+  return { pass: true }
 }
