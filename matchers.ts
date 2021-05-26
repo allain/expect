@@ -313,7 +313,9 @@ export function toHaveLength(value: any, length: number): MatchResult {
 }
 
 export function toContain(value: any, item: any): MatchResult {
-  if (Array.isArray(value) && value.includes(item)) return { pass: true }
+  if (value && typeof value.includes === 'function' && value.includes(item)) {
+    return { pass: true }
+  }
 
   const actualString = createStr(value)
   const itemString = createStr(item)
@@ -332,6 +334,7 @@ export function toContain(value: any, item: any): MatchResult {
     )
   }
 }
+
 export function toThrow(value: any, error?: RegExp | string): MatchResult {
   let fn
   if (typeof value === 'function') {
