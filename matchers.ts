@@ -320,7 +320,7 @@ export function toContain(value: any, item: any): MatchResult {
   const actualString = createStr(value)
   const itemString = createStr(item)
 
-  if (Array.isArray(value)) {
+  if (value && typeof value.includes === 'function') {
     return buildFail(
       `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    ${red(
         actualString
@@ -330,7 +330,7 @@ export function toContain(value: any, item: any): MatchResult {
     return buildFail(
       `expect(${ACTUAL}).toContain(${EXPECTED})\n\n    expected ${red(
         actualString
-      )} to contain ${green(itemString)} but it is ${red('not')} an array`
+      )} to have an includes method but it is ${green(itemString)}`
     )
   }
 }

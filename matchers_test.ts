@@ -397,11 +397,17 @@ Deno.test({
 
                 [ 2, 3 ] did not contain 1`
     })
+    assertResult(toContain('Hello', 'Good'), {
+      pass: false,
+      message: `expect(actual).toContain(expected)
+
+                "Hello" did not contain "Good"`
+    })
     assertResult(toContain(false, 1), {
       pass: false,
       message: `expect(actual).toContain(expected)
 
-                expected false to contain 1 but it is not an array`
+                expected false to have an includes method but it is 1`
     })
   }
 })
