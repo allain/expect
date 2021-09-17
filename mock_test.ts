@@ -36,8 +36,16 @@ Deno.test({
 Deno.test({
   name: "canSpecifyFunctionNameAsFirstArg",
   fn: () => {
-    const f1 = mock.fn("Test");
-    assertEquals(f1.name, "Test");
+    const f1 = mock.fn();
+    assertEquals(f1.name, "f");
+
+    const f2 = mock.fn("test");
+    assertEquals(f2.name, "test");
+
+    const f3 = mock.fn("test2", () => "CALLED");
+    assertEquals(f3.name, "test2");
+    const result = f3();
+    assertEquals(result, "CALLED");
   },
 });
 
