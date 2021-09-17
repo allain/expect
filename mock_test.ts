@@ -16,14 +16,28 @@ Deno.test({
     const calls = mock.calls(f);
     assert(Array.isArray(calls));
     assertEquals(calls.length, 2);
-    assertEquals(calls.map((c: any) => c.args), [[10], [20]]);
-    assertEquals(calls.map((c: any) => c.returned), [undefined, undefined]);
+    assertEquals(
+      calls.map((c: any) => c.args),
+      [[10], [20]]
+    );
+    assertEquals(
+      calls.map((c: any) => c.returned),
+      [undefined, undefined]
+    );
 
     assert(
-      calls.map((c: any) => typeof c.timestamp).every((t: string) =>
-        t === "number"
-      ),
+      calls
+        .map((c: any) => typeof c.timestamp)
+        .every((t: string) => t === "number")
     );
+  },
+});
+
+Deno.test({
+  name: "canSpecifyFunctionNameAsFirstArg",
+  fn: () => {
+    const f1 = mock.fn("Test");
+    assertEquals(f1.name, "Test");
   },
 });
 
@@ -34,7 +48,7 @@ Deno.test({
       () => 1,
       () => {
         throw new Error("TEST");
-      },
+      }
     );
     try {
       f();
@@ -54,7 +68,7 @@ Deno.test({
     const f = mock.fn(
       (n: number) => n,
       (n: number) => n * 2,
-      (n: number) => n * 3,
+      (n: number) => n * 3
     );
     f(1);
     f(1);
@@ -66,7 +80,7 @@ Deno.test({
     assertEquals(calls.length, 5);
     assertEquals(
       calls.map((c: mock.MockCall) => c.returned),
-      [1, 2, 3, undefined, undefined],
+      [1, 2, 3, undefined, undefined]
     );
   },
 });
