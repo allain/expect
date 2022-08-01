@@ -55,8 +55,8 @@ export function expect(value: any): Expected {
         }
 
         if (name === "resolves") {
-          if (!(value instanceof Promise)) {
-            throw new AssertionError("expected value must be a Promise");
+          if (!isPromiseLike(value)) {
+            throw new AssertionError("expected value must be Promiselike");
           }
 
           isPromised = true;
@@ -64,8 +64,8 @@ export function expect(value: any): Expected {
         }
 
         if (name === "rejects") {
-          if (!(value instanceof Promise)) {
-            throw new AssertionError("expected value must be a Promise");
+          if (!isPromiseLike(value)) {
+            throw new AssertionError("expected value must be a PromiseLike");
           }
 
           value = value.then(
@@ -117,4 +117,13 @@ export function expect(value: any): Expected {
 
 export function addMatchers(newMatchers: Matchers): void {
   Object.assign(matchers, newMatchers);
+}
+
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  if (value == null) {
+    return false;
+  } else {
+    return typeof((value as Record<string, unknown>).then) === 'function';
+  }
 }
