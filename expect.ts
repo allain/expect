@@ -3,7 +3,7 @@ import type { Matcher, Matchers } from "./matchers.ts";
 
 import { AssertionError } from "https://deno.land/std@0.97.0/testing/asserts.ts";
 
-interface Expected {
+export interface Expected {
   toBe(candidate: any): void;
   toEqual(candidate: any): void;
   toBeTruthy(): void;
@@ -34,8 +34,8 @@ interface Expected {
   toHaveNthReturnedWith(nthCall: number, value: any): void;
 
   not: Expected;
-  resolves: Expected;
-  rejects: Expected;
+  resolves: Async<Expected>;
+  rejects: Async<Expected>;
 }
 
 const matchers: Record<any, Matcher> = {
@@ -113,6 +113,15 @@ export function expect(value: any): Expected {
   );
 
   return self;
+}
+
+// a helper type to match any function. Used so that we only convert functions
+// to return a promise and not properties.
+type Fn = (...args: any[]) => any;
+
+// converts all the menthods in an interface to be async functions
+export type Async<T> = {
+  [K in keyof T]: T[K] extends Fn ? (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> : T[K];
 }
 
 export function addMatchers(newMatchers: Matchers): void {
