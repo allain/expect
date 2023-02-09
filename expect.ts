@@ -14,7 +14,7 @@ export interface Expected {
   toBeNull(): void;
   toBeNaN(): void;
   toMatch(pattern: RegExp | string): void;
-  toHaveProperty(propName: string): void;
+  toHaveProperty(propName: string, propValue?: any): void;
   toHaveLength(length: number): void;
   toContain(item: any): void;
   toThrow(error?: RegExp | string): void;

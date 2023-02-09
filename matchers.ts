@@ -285,8 +285,11 @@ export function toMatch(value: any, pattern: RegExp | string): MatchResult {
   }
 }
 
-export function toHaveProperty(value: any, propName: string): MatchResult {
+export function toHaveProperty(value: any, propName: string, propValue?: any): MatchResult {
   if (typeof value === 'object' && typeof value[propName] !== 'undefined') {
+    if (typeof propValue !== 'undefined') {
+      return toHavePropertyWithValue(value, propName, propValue);
+    }
     return { pass: true }
   }
 
@@ -299,6 +302,23 @@ export function toHaveProperty(value: any, propName: string): MatchResult {
     )} did not contain property ${green(propNameString)}`
   )
 }
+
+function toHavePropertyWithValue(value: any, propName: string, propValue: any): MatchResult {
+  const propValueString = createStr(propValue);
+  const propNameString = createStr(propName);
+  const actualString = createStr(value[propName]);
+
+  if (typeof value === 'object' && equal(value[propName], propValue)) {
+    return { pass: true };
+  }
+
+  const VALUE = green(bold('value'));
+
+  return buildFail(
+    `expect(${ACTUAL}).toHaveProperty(${EXPECTED}, ${VALUE})\n\n    expected property ${green(propNameString)} to equal ${green(propValueString)} but was ${red(actualString)}`
+  );
+}
+
 export function toHaveLength(value: any, length: number): MatchResult {
   if (value?.length === length) return { pass: true }
 
