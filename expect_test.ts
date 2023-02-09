@@ -356,9 +356,15 @@ Deno.test({
 Deno.test({
   name: "toHaveProperty",
   fn: async () => {
-    await assertAllPass(() => expect({ a: "10" }).toHaveProperty("a"));
+    await assertAllPass(
+      () => expect({ a: "10" }).toHaveProperty("a"),
+      () => expect({ a: "10" }).toHaveProperty("a", "10"),
+    );
 
-    await assertAllFail(() => expect({ a: 1 }).toHaveProperty("b"));
+    await assertAllFail(
+      () => expect({ a: 1 }).toHaveProperty("b"),
+      () => expect({ a: 1 }).toHaveProperty("a", 2),
+    );
   },
 });
 
