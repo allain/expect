@@ -7,6 +7,7 @@ import * as mock from './mock.ts'
 import {
   MatchResult,
   toBe,
+  toBeCloseTo,
   toBeDefined,
   toBeFalsy,
   toBeGreaterThan,
@@ -377,6 +378,82 @@ Deno.test({
 
                 expected array to have length 1 but was 0`
     })
+  }
+})
+
+Deno.test({
+  name: 'toBeCloseToPass',
+  fn: () => {
+    ;[
+      [0, 0],
+      [0, 0.001],
+      [1.23, 1.229],
+      [1.23, 1.226],
+      [1.23, 1.225],
+      [1.23, 1.234],
+      [Infinity, Infinity],
+      [-Infinity, -Infinity],
+      [0, 0.1, 0],
+      [0, 0.0001, 3],
+      [0, 0.000004, 5],
+      [2.0000002, 2, 5]
+    ].forEach(([n1, n2, p]) => {
+      assertResultPass(toBeCloseTo(n1, n2, p))
+    })
+  }
+})
+
+Deno.test({
+  name: 'toBeCloseToFail',
+  fn: () => {
+    assertResult(toBeCloseTo(0, 0.01), {
+      pass: false,
+      message: `expect(actual).toBeCloseTo(expected, 2)
+                    -   0
+                    +   0.01`
+    }),
+      assertResult(toBeCloseTo(1, 1.23), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, 2)
+                        -   1
+                        +   1.23`
+      }),
+      assertResult(toBeCloseTo(1.23, 1.2249999), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, 2)
+                        -   1.23
+                        +   1.2249999`
+      }),
+      assertResult(toBeCloseTo(Infinity, -Infinity), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, 2)
+                        -   Infinity
+                        +   -Infinity`
+      }),
+      assertResult(toBeCloseTo(Infinity, 1.23), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, 2)
+                        -   Infinity
+                        +   1.23`
+      }),
+      assertResult(toBeCloseTo(-Infinity, -1.23), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, 2)
+                        -   -Infinity
+                        +   -1.23`
+      }),
+      assertResult(toBeCloseTo(3.141592e-7, 3e-7, 8), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, 8)
+                        -   3.141592e-7
+                        +   3e-7`
+      }),
+      assertResult(toBeCloseTo(56789, 51234, -4), {
+        pass: false,
+        message: `expect(actual).toBeCloseTo(expected, -4)
+                        -   56789
+                        +   51234`
+      })
   }
 })
 

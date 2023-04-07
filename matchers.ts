@@ -256,6 +256,38 @@ export function toBeInstanceOf(value: any, expected: Function): MatchResult {
   )
 }
 
+export function toBeCloseTo(
+  actual: number,
+  expected: number,
+  precision = 2
+): MatchResult {
+  // const secondArgument = arguments.length === 3 ? 'precision' : undefined;
+
+  let pass = false
+  let expectedDiff = 0
+  let actualDiff = 0
+
+  if (actual === Infinity && expected === Infinity) {
+    pass = true // Infinity - Infinity is NaN
+  } else if (actual === -Infinity && expected === -Infinity) {
+    pass = true // -Infinity - -Infinity is NaN
+  } else {
+    expectedDiff = Math.pow(10, -precision) / 2
+    actualDiff = Math.abs(expected - actual)
+    pass = actualDiff < expectedDiff
+  }
+
+  if (pass) return { pass: true }
+  else {
+    return buildFail(
+      `expect(${ACTUAL}).toBeCloseTo(${EXPECTED}, ${precision})\n\n${buildDiffMessage(
+        actual,
+        expected
+      )}`
+    )
+  }
+}
+
 export function toMatch(value: any, pattern: RegExp | string): MatchResult {
   const valueStr = value.toString()
   if (typeof pattern === 'string') {

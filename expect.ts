@@ -6,6 +6,7 @@ import { AssertionError } from "https://deno.land/std@0.97.0/testing/asserts.ts"
 export interface Expected {
   toBe(candidate: any): void;
   toEqual(candidate: any): void;
+  toBeCloseTo(candidate: number, precision?: number): void;
   toBeTruthy(): void;
   toBeFalsy(): void;
   toBeDefined(): void;

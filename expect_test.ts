@@ -354,6 +354,21 @@ Deno.test({
 });
 
 Deno.test({
+  name: 'toBeClose',
+  fn: async () => {
+    await assertAllPass(
+      () => expect(0.2 + 0.1).toBeCloseTo(0.3),
+      () => expect(0.2 + 0.1).toBeCloseTo(0.3, 5)
+    )
+
+    await assertAllFail(
+      () => expect(1.01 + 0.22).toBeCloseTo(1.2249999),
+      () => expect(3.141592e-7).toBeCloseTo(3e-7, 8)
+    )
+  }
+})
+
+Deno.test({
   name: "toHaveProperty",
   fn: async () => {
     await assertAllPass(
