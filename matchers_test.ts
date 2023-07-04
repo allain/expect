@@ -16,6 +16,7 @@ import {
   toBeNaN,
   toBeNull,
   toBeTruthy,
+  toBeTypeOf,
   toBeUndefined,
   toContain,
   toEqual,
@@ -188,6 +189,33 @@ Deno.test({
     })
   }
 })
+
+Deno.test({
+  name: "toBeTypeOfPass",
+  fn: () => {
+    assertResultPass(toBeTypeOf(BigInt(123), "bigint"));
+    assertResultPass(toBeTypeOf(true, "boolean"));
+    assertResultPass(toBeTypeOf(() => false, "function"));
+    assertResultPass(toBeTypeOf(123, "number"));
+    assertResultPass(toBeTypeOf(123.123, "number"));
+    assertResultPass(toBeTypeOf(new Object(), 'object'));
+    assertResultPass(toBeTypeOf("stringstring", 'string'));
+    assertResultPass(toBeTypeOf(Symbol("testSymbol"), 'symbol'));
+    assertResultPass(toBeTypeOf(undefined, 'undefined'));
+  },
+});
+
+Deno.test({
+  name: "toBeTypeOfFail",
+  fn: () => {
+    assertResult(toBeTypeOf(123, "bigint"),{
+      pass: false,
+      message: `expect(actual).toBeTypeOf(expected)
+      
+      123 is not a bigint`
+    });
+  },
+});
 
 Deno.test({
   name: 'toBeFalsyPass',

@@ -191,6 +191,44 @@ export function toBeTruthy(value: any): MatchResult {
       ${red(actualString)} is not truthy`)
 }
 
+export function toBeTypeOf(
+  value: any,
+  expectedType:
+    | "bigint"
+    | "boolean"
+    | "function"
+    | "number"
+    | "object"
+    | "string"
+    | "symbol"
+    | "undefined",
+): MatchResult {
+  const valueString = createStr(value);
+  if (
+    [
+      "bigint",
+      "boolean",
+      "function",
+      "number",
+      "object",
+      "string",
+      "symbol",
+      "undefined",
+    ].includes(expectedType)
+  ) {
+    return typeof value === expectedType ? { pass: true } : buildFail(
+      `expect(${ACTUAL}).toBeTypeOf(${EXPECTED})\n\n ${
+        red(valueString)
+      } is not a ${expectedType}`,
+    );
+  }
+  return buildFail(
+    `expect(${ACTUAL}).toBeTypeOf(${EXPECTED})\n\n ${
+      red(expectedType)
+    } is not a known type to evaluate }`,
+  );
+}
+
 export function toBeFalsy(value: any): MatchResult {
   if (!value) return { pass: true }
 

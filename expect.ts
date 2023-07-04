@@ -10,6 +10,7 @@ export interface Expected {
   toBeFalsy(): void;
   toBeDefined(): void;
   toBeInstanceOf(clazz: any): void;
+  toBeTypeOf(type:"bigint"|"boolean"|"function"|"number"|"object"|"string"|"symbol"|"undefined"): void;
   toBeUndefined(): void;
   toBeNull(): void;
   toBeNaN(): void;
