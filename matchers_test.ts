@@ -2,6 +2,7 @@ import {
   assert,
   assertEquals
 } from 'https://deno.land/std@0.97.0/testing/asserts.ts'
+
 import * as mock from './mock.ts'
 
 import {
@@ -464,8 +465,8 @@ Deno.test({
       {
         pass: false,
         message: `expect(actual).toThrow(expected)
-
-                expected [Function] to throw but it did not`
+                
+                  expected [Function (anonymous)] to throw but it did not`
       }
     )
 
@@ -477,7 +478,7 @@ Deno.test({
         pass: false,
         message: `expect(actual).toThrow(expected)
 
-                  expected [Function] to throw error matching "TEST" but it threw Error: BLAH`
+                  expected [Function (anonymous)] to throw error matching "TEST" but it threw Error: BLAH`
       }
     )
 
@@ -489,7 +490,7 @@ Deno.test({
         pass: false,
         message: `expect(actual).toThrow(expected)
 
-                  expected [Function] to throw error matching /^TEST/ but it threw Error: BLAH`
+                  expected [Function (anonymous)] to throw error matching /^TEST/ but it threw Error: BLAH`
       }
     )
   }
