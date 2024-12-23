@@ -1,3 +1,7 @@
+# DEPRECATED
+
+I recommend you use [jst@std/expect](https://jsr.io/@std/expect) instead.
+
 # expect
 
 [![][ghw badge]][ghw link]
