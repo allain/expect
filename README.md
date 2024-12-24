@@ -1,6 +1,6 @@
 # DEPRECATED
 
-I recommend you use [jst@std/expect](https://jsr.io/@std/expect) instead.
+I recommend you use [jsr:@std/expect](https://jsr.io/@std/expect) instead.
 
 # expect
 
